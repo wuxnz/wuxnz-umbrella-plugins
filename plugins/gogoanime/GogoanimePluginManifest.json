@@ -1,0 +1,15 @@
+{
+  "sourceType": "Video",
+  "author": "invader",
+  "name": "Goganime Plugin",
+  "version": 1,
+  "description": "Gogoanime for Umbrella by invader",
+  "homePageUrl": "http://192.168.1.16:5500",
+  "iconUrl": "https://gogoanimez.to/wp-content/uploads/2025/05/cropped-gogoanime-icon-192x192.webp",
+  "manifestUrl": "http://192.168.1.16:5500/plugins/gogoanime/GogoanimePluginManifest.json",
+  "pluginUrl": "http://192.168.1.16:5500/plugins/gogoanime/GogoanimePlugin.js",
+  "bannerImageUrl": "https://gogoanimez.to/wp-content/uploads/2025/05/Picsart_24-11-23_17-38-10-572.png",
+  "changelog": "Added getItemMedia function to plugin",
+  "readme": "This is a plugin that allows you to scrape Gogoanime for Umbrella.",
+  "license": "MIT"
+}
