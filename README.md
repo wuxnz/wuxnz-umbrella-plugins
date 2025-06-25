@@ -2,6 +2,8 @@
 
 This repository hosts plugins for the [Umbrella](https://github.com/new-umbrella/umbrella) mobile application - an open-source platform for streaming media content.
 
+# Homepage: [wuxnz Umbrella Plugins](https://wuxnz.github.io/wuxnz-umbrella-plugins)
+
 ## Available Plugins
 
 ### Example Plugin
