@@ -70,9 +70,9 @@
       }
 
       .plugins-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 25px;
+        display: flex;
+        /* grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); */
+        flex-wrap: wrap;
       }
 
       .plugin-card {
@@ -84,8 +84,10 @@
         overflow: hidden;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
         transition: transform 0.4s ease, box-shadow 0.4s ease;
-        width: 95%;
+        width: 30%;
+        margin: 1.5%;
         height: 100%;
+        min-height: 625px;
         display: flex;
         flex-direction: column;
       }
@@ -160,6 +162,20 @@
         border-radius: 6px;
         margin-top: 18px;
         font-size: 0.8rem;
+      }
+
+      @media (max-width: 1200px) {
+        .plugin-card {
+          width: 45%;
+          margin: 2.5%;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .plugin-card {
+          width: 90%;
+          margin: 5%;
+        }
       }
     </style>
   </head>
