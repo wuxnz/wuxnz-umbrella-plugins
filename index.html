@@ -232,7 +232,7 @@
             </div>
             <a
               id="example-plugin"
-              href="umbrella://https://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/example/ExamplePluginManifest.json"
+              href="umbrella://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/example/ExamplePluginManifest.json"
               class="install-btn"
               >Install Plugin</a
             >
@@ -262,7 +262,7 @@
             </div>
             <a
               id="gogoanime-plugin"
-              href="umbrella://https://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime/GogoanimePluginManifest.json"
+              href="umbrella://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime/GogoanimePluginManifest.json"
               class="install-btn"
               >Install Plugin</a
             >
@@ -294,7 +294,7 @@
             </div>
             <a
               id="gogoanime-old-plugin"
-              href="umbrella://https://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime-old/GogoanimePluginOldManifest.json"
+              href="umbrella://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime-old/GogoanimePluginOldManifest.json"
               class="install-btn"
               >Install Plugin</a
             >
@@ -305,17 +305,17 @@
 
     <script>
       // Update deep links with current origin
-      document.getElementById("example-plugin").href = document
-        .getElementById("example-plugin")
-        .href.replace("{}", location.origin.split("://")[1]);
+      // document.getElementById("example-plugin").href = document
+      //   .getElementById("example-plugin")
+      //   .href.replace("{}", location.origin.split("://")[1]);
 
-      document.getElementById("gogoanime-plugin").href = document
-        .getElementById("gogoanime-plugin")
-        .href.replace("{}", location.origin.split("://")[1]);
+      // document.getElementById("gogoanime-plugin").href = document
+      //   .getElementById("gogoanime-plugin")
+      //   .href.replace("{}", location.origin.split("://")[1]);
 
-      document.getElementById("gogoanime-old-plugin").href = document
-        .getElementById("gogoanime-old-plugin")
-        .href.replace("{}", location.origin.split("://")[1]);
+      // document.getElementById("gogoanime-old-plugin").href = document
+      //   .getElementById("gogoanime-old-plugin")
+      //   .href.replace("{}", location.origin.split("://")[1]);
     </script>
   </body>
 </html>
