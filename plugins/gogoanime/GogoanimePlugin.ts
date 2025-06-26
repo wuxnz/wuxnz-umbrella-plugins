@@ -80,7 +80,9 @@ class GogoanimePlugin {
     const description = response.match(descriptionRegex)[1].trim();
     const imageUrlRegex = /<div.*class="thumb"[\s\S]*?<img[\s\S]*?src="(.*?)"/;
     var imageUrl = response.match(imageUrlRegex)[1];
-    const language = name.includes("(Dub)") ? "English" : "Japanese";
+    const language = name.toLocaleLowerCase().includes("(dub)")
+      ? "English"
+      : "Japanese";
     const synopsisRegex =
       /<div.*class="entry-content".*itemprop="description">([\s\S]*?)<\/div/;
     var synopsis = response
@@ -127,7 +129,9 @@ class GogoanimePlugin {
         id: episode[1].split("/")[episode[1].split("/").length - 2],
         name: `Episode ${episode[2].trim()}`,
         url: episode[1],
-        language: name.includes("(Dub)") ? "English" : "Sub",
+        language: name.toLocaleLowerCase().includes("(dub)")
+          ? "English"
+          : "Sub",
         number: parseInt(episode[2].trim()),
       });
     }
