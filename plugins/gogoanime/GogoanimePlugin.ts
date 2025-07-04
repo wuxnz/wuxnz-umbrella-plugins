@@ -20,7 +20,7 @@ class GogoanimePlugin {
       if (!response) {
         return {};
       }
-      const ulRegex = /listupd"[\s\S]*?>([\s\S]*<\/article>)/;
+      const ulRegex = /listupd">([\s\S]*<\/article>)/;
       var listUl;
       try {
         listUl = response.match(ulRegex)[1];

@@ -7,9 +7,24 @@ const plugins = [GogoanimePlugin]; //, GogoanimePluginOld];
 
 function testPlugin(plugin: any) {
   try {
-    plugin.search("naruto", 1).then((res) => {
+    plugin.search("one", 1).then((res) => {
       if (res.name) {
         console.log(`✅ ${res.name} - ${res.description}`);
+        if (res.items.length > 0) {
+          console.log(`✅ ${res.items.length} items found.`);
+          console.log(`Attempting to get details for first item...`);
+          try {
+            plugin.getItemDetails(res.items[0].id).then((item) => {
+              console.log(`✅ ${item.name} - ${item.description}`);
+            });
+          } catch (error) {
+            console.log(
+              `❌ Item details failed for ${res.items[0].id}: ${error}`
+            );
+          }
+        } else {
+          console.log(`❌ No items found`);
+        }
       } else {
         console.log(`❌ Search failed for ${plugin.constructor.name}`);
       }
