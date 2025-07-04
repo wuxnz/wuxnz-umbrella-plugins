@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 // Functions' return types are placeholders
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
-class ExamplePlugin {
+class GogoanimePluginOld {
     constructor() {
         this.baseUrl = "https://ww31.gogoanimes.fi";
         //   ajaxUrl = "https://ajax.gogocdn.net";
@@ -272,9 +272,9 @@ class ExamplePlugin {
     }
 }
 module.exports = {
-    search: (query, page) => __awaiter(this, void 0, void 0, function* () { return new ExamplePlugin().search(query, page); }),
-    getCategory: (category, page) => __awaiter(this, void 0, void 0, function* () { return new ExamplePlugin().getCategory(category, page); }),
-    getHomeCategories: () => __awaiter(this, void 0, void 0, function* () { return new ExamplePlugin().getHomeCategories(); }),
-    getItemDetails: (id) => __awaiter(this, void 0, void 0, function* () { return new ExamplePlugin().getItemDetails(id); }),
-    getItemMedia: (id) => __awaiter(this, void 0, void 0, function* () { return new ExamplePlugin().getItemDetails(id); }),
+    search: (query, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().search(query, page); }),
+    getCategory: (category, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getCategory(category, page); }),
+    getHomeCategories: () => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getHomeCategories(); }),
+    getItemDetails: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
+    getItemMedia: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
 };

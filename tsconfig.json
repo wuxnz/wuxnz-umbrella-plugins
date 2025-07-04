@@ -10,5 +10,5 @@
     "types": ["node"]
   },
   "lib": ["es2015"],
-  "exclude": ["node_modules", "dist", "models"]
+  "exclude": ["node_modules", "dist", "models", "pluginTests.ts"]
 }

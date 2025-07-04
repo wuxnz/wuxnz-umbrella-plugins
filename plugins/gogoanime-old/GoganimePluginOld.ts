@@ -4,7 +4,7 @@
 // Functions' return types are placeholders
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
-class ExamplePlugin {
+class GogoanimePluginOld {
   baseUrl = "https://ww31.gogoanimes.fi";
   //   ajaxUrl = "https://ajax.gogocdn.net";
   sourceType = "Video";
@@ -262,12 +262,15 @@ class ExamplePlugin {
     return embedInfoList;
   }
 }
+
 module.exports = {
   search: async (query: string, page?: number) =>
-    new ExamplePlugin().search(query, page),
+    new GogoanimePluginOld().search(query, page),
   getCategory: async (category: string, page?: number) =>
-    new ExamplePlugin().getCategory(category, page),
-  getHomeCategories: async () => new ExamplePlugin().getHomeCategories(),
-  getItemDetails: async (id: string) => new ExamplePlugin().getItemDetails(id),
-  getItemMedia: async (id: string) => new ExamplePlugin().getItemDetails(id),
+    new GogoanimePluginOld().getCategory(category, page),
+  getHomeCategories: async () => new GogoanimePluginOld().getHomeCategories(),
+  getItemDetails: async (id: string) =>
+    new GogoanimePluginOld().getItemDetails(id),
+  getItemMedia: async (id: string) =>
+    new GogoanimePluginOld().getItemDetails(id),
 };

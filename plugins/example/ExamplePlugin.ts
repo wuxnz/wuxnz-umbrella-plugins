@@ -16,7 +16,7 @@
 // Functions' return types are placeholders
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
-class ExamplePluginTemplate {
+class ExamplePlugin {
   async search(query: string, page?: number) {
     return {};
   }
@@ -40,13 +40,15 @@ class ExamplePluginTemplate {
 
 module.exports = {
   search: async (query: string, page?: number): Promise<object> =>
-    new ExamplePluginTemplate().search(query, page),
+    new ExamplePlugin().search(query, page),
   getCategory: async (category: string, page?: number): Promise<object> =>
-    new ExamplePluginTemplate().getCategory(category, page),
+    new ExamplePlugin().getCategory(category, page),
   getHomeCategories: async (): Promise<object[]> =>
-    new ExamplePluginTemplate().getHomeCategories(),
+    new ExamplePlugin().getHomeCategories(),
   getItemDetails: async (id: string): Promise<object> =>
-    new ExamplePluginTemplate().getItemDetails(id),
+    new ExamplePlugin().getItemDetails(id),
   getItemMedia: async (id: string): Promise<object[]> =>
-    new ExamplePluginTemplate().getItemMedia(id),
+    new ExamplePlugin().getItemMedia(id),
 };
+
+export default ExamplePlugin;

@@ -31,20 +31,22 @@ class GogoanimePlugin {
                 if (!response) {
                     return {};
                 }
-                const ulRegex = /<div.*class="listupd".*>([\s\S]*<\/article>)[\s\S]*?<\/div>/;
+                const ulRegex = /class="listupd"[\s\S]*?>([\s\S]*<\/article>)/;
                 const listUl = response.match(ulRegex)[1];
                 const listItemsRegex = /<article[\s\S]*?>([\s\S]*?)<\/article>/g;
                 const listItems = [...listUl.matchAll(listItemsRegex)].map((item) => item[1]);
                 const items = [];
                 const idRegex = /<a[\s\S]*?href=".*\/anime\/(.*?)\/"/;
                 const nameRegex = /url"[\s\S]*?title="([\s\S]*?)"/;
-                const descriptionRegex = /class="limit">[\s\S]*?>(.*?)</;
+                const descriptionRegex = /limit">[\s\S]*?>([\s\S]*?)</;
                 const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
                 for (const item of listItems) {
                     const id = item.match(idRegex)[1];
                     const name = item.match(nameRegex)[1].replace(/&.*?;/g, "");
                     // throw new Error(name);
-                    const description = item.match(descriptionRegex)[1].trim() || "";
+                    const description = item.match(descriptionRegex) === null
+                        ? ""
+                        : item.match(descriptionRegex)[1];
                     var imageUrl = item.match(imageUrlRegex)[1];
                     items.push({
                         id,
