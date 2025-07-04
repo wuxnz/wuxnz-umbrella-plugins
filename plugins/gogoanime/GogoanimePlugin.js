@@ -36,7 +36,7 @@ class GogoanimePlugin {
                 const listItemsRegex = /<article[\s\S]*?>([\s\S]*?)<\/article>/g;
                 const listItems = [...listUl.matchAll(listItemsRegex)].map((item) => item[1]);
                 const items = [];
-                const idRegex = /<a[\s\S]*?[\s\S]*?href=".*\/series\/(.*?)\/"/;
+                const idRegex = /<a[\s\S]*?href=".*\/anime\/(.*?)\/"/;
                 const nameRegex = /url"[\s\S]*?title="([\s\S]*?)"/;
                 const descriptionRegex = /class="limit">[\s\S]*?>(.*?)</;
                 const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
