@@ -16,6 +16,21 @@ function testPlugin(plugin: any) {
           try {
             plugin.getItemDetails(res.items[0].id).then((item) => {
               console.log(`✅ ${item.name} - ${item.description}`);
+              if (item.media.length > 0) {
+                console.log(`✅ ${item.media.length} media found`);
+                console.log("Attempting to get media for first item...");
+                try {
+                  plugin.getItemMedia(item.media[0].id).then((media) => {
+                    console.log(`✅ ${media.length} media found`);
+                  });
+                } catch (error) {
+                  console.log(
+                    `❌ Media failed for ${res.items[0].id}: ${error}`
+                  );
+                }
+              } else {
+                console.log(`❌ No media found`);
+              }
             });
           } catch (error) {
             console.log(

@@ -25,6 +25,7 @@ class GogoanimePlugin {
       try {
         listUl = response.match(ulRegex)[1];
       } catch (error) {
+        console.log(error);
         return {
           name: "Gogoanime",
           description: `Search results for ${query}`,
@@ -123,7 +124,7 @@ class GogoanimePlugin {
         genre[1] = `${this.baseUrl}/${genre[1]}`;
       }
       genres.push({
-        id: genre[1].split("/").pop(),
+        id: genre[1].split("/")[genre[1].split("/").length - 2],
         name: genre[2],
         url: genre[1].startsWith("/") ? this.baseUrl + genre[1] : genre[1],
       });
@@ -139,12 +140,12 @@ class GogoanimePlugin {
     //   /<ul>[\s\S]*?\!--themesia.*?>([\s\S]*?)<\!--themesia.*?>[\s\S]*?<\/ul>/;
     // const episodeContainer = response.match(episodeContainerRegex)[1];
     const episodesRegex =
-      /<a[\s\S]*?href="(.*?)"[\s\S]*?data-number="(.*?)"[\s\S]*?data-id="(.*?)"[\s\S]*?order">(.*)</g;
-    const episodesList = [...response.matchAll(episodesRegex)];
+      /<a href="(.*?)">[\s\S]*?num">([\s\S]*?)<[\s\S]*?title">([\s\S]*?)</g;
+    const episodesList = [...response.matchAll(episodesRegex)].slice(1);
     for (const episode of episodesList) {
       episodes.push({
         id: episode[1].split("/")[episode[1].split("/").length - 2],
-        name: `Episode ${episode[2].trim()}`,
+        name: episode[3].trim(),
         url: episode[1],
         language: name.toLocaleLowerCase().includes("(dub)")
           ? "English"
@@ -176,33 +177,42 @@ class GogoanimePlugin {
     if (!episodePageResponse) {
       return [];
     }
-    const base64EmbedLinksRegex = /data-hash="(.*?)">(.*?)</g;
-    const embedLinkRegex = /src="(.*?)"/;
-    const sources = [
-      ...episodePageResponse.matchAll(base64EmbedLinksRegex),
-    ].map((mat, index) => {
-      const url = buffer
-        .from(mat[1], "base64")
-        .toString("utf-8")
-        .match(embedLinkRegex)[1];
-      // const origin = url
-      //   ? url.match(/http.*:\/\/(.*)\..*/)[1]
-      //   : "Unknown Source";
-      const sourceName =
-        // origin.length > 0
-        //   ? `${index + 1} - ${origin[0].toUpperCase() + origin.slice(1)}`
-        //   : "Unknown Source";
-        mat[2];
-      return {
+    // const base64EmbedLinksRegex = /data-hash="(.*?)">(.*?)</g;
+    // const embedLinkRegex = /src="(.*?)"/;
+    // const sources = [
+    //   ...episodePageResponse.matchAll(base64EmbedLinksRegex),
+    // ].map((mat, index) => {
+    //   const url = buffer
+    //     .from(mat[1], "base64")
+    //     .toString("utf-8")
+    //     .match(embedLinkRegex)[1];
+    //   const sourceName =
+    //     mat[2];
+    //   return {
+    //     type: "ExtractorVideo",
+    //     url: url,
+    //     name: sourceName,
+    //     headers: {
+    //       "User-Agent":
+    //         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
+    //     },
+    //   };
+    // });
+    var sources = [];
+    const rawSourcesRegex = /<option[\s\S]*?value="(.+?)"[\s\S]*?>([\s\S]*?)</g;
+    const rawSourcesList = [...episodePageResponse.matchAll(rawSourcesRegex)];
+    for (const rawSource of rawSourcesList) {
+      const rawSourceResponse = await fetch(rawSource[1])
+        .then((response) => response)
+        .then((data) => data.text());
+      const sourceRegex = /<iframe[\s\S]*?src="(.*?)"/;
+      const source = rawSourceResponse.match(sourceRegex)[1];
+      sources.push({
         type: "ExtractorVideo",
-        url: url,
-        name: sourceName,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
-        },
-      };
-    });
+        url: source,
+        name: rawSource[2].trim(),
+      });
+    }
     return sources;
   }
 }

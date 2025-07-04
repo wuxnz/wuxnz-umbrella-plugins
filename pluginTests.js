@@ -14,6 +14,21 @@ function testPlugin(plugin) {
                     try {
                         plugin.getItemDetails(res.items[0].id).then(function (item) {
                             console.log("\u2705 ".concat(item.name, " - ").concat(item.description));
+                            if (item.media.length > 0) {
+                                console.log("\u2705 ".concat(item.media.length, " media found"));
+                                console.log("Attempting to get media for first item...");
+                                try {
+                                    plugin.getItemMedia(item.media[0].id).then(function (media) {
+                                        console.log("\u2705 ".concat(media.length, " media found"));
+                                    });
+                                }
+                                catch (error) {
+                                    console.log("\u274C Media failed for ".concat(res.items[0].id, ": ").concat(error));
+                                }
+                            }
+                            else {
+                                console.log("\u274C No media found");
+                            }
                         });
                     }
                     catch (error) {
