@@ -31,8 +31,22 @@ class GogoanimePlugin {
                 if (!response) {
                     return {};
                 }
-                const ulRegex = /class="listupd"[\s\S]*?>([\s\S]*<\/article>)/;
-                const listUl = response.match(ulRegex)[1];
+                const ulRegex = /listupd"[\s\S]*?>([\s\S]*<\/article>)/;
+                var listUl;
+                try {
+                    listUl = response.match(ulRegex)[1];
+                }
+                catch (error) {
+                    return {
+                        name: "Gogoanime",
+                        description: `Search results for ${query}`,
+                        url: decodeURIComponent(`${this.baseUrl}/page/${pageNum}/?s=${query}`),
+                        isPaginated: true,
+                        nextPageNumber: page + 1,
+                        previousPageNumber: page > 1 ? page - 1 : undefined,
+                        items: [],
+                    };
+                }
                 const listItemsRegex = /<article[\s\S]*?>([\s\S]*?)<\/article>/g;
                 const listItems = [...listUl.matchAll(listItemsRegex)].map((item) => item[1]);
                 const items = [];
