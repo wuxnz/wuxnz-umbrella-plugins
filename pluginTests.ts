@@ -3,7 +3,7 @@ import * as GogoanimePlugin from "./plugins/gogoanime/GogoanimePlugin";
 // @ts-ignore
 import * as GogoanimePluginOld from "./plugins/gogoanime-old/GoganimePluginOld";
 
-const plugins = [GogoanimePlugin]; //, GogoanimePluginOld];
+const plugins = [GogoanimePlugin, GogoanimePluginOld];
 
 function testPlugin(plugin: any) {
   try {

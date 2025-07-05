@@ -5,7 +5,8 @@
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
 class GogoanimePluginOld {
-  baseUrl = "https://ww31.gogoanimes.fi";
+  baseUrl = "https://gogoanimes.fi";
+  // baseUrl = "https://gogoanime.ink";
   //   ajaxUrl = "https://ajax.gogocdn.net";
   sourceType = "Video";
   async search(query, page) {
@@ -24,10 +25,11 @@ class GogoanimePluginOld {
         (item) => item[1]
       );
       const items = [];
-      const idRegex = /<a href="\/category\/(.*?)" title=".*?">/;
-      const nameRegex = /<a href="\/category\/.*?" title="(.*?)">/;
-      const descriptionRegex = /(Released: .*?)<\/p>/;
-      const imageUrlRegex = /<img src="(.*?)".*alt=".*?"[\s\S]*?>/;
+      const idRegex = /<a[\s\S]*?href="\/category\/(.*?)"[\s\S]*?title=".*?">/;
+      const nameRegex =
+        /<a[\s\S]*?href="\/category\/.*?"[\s\S]*?title="(.*?)">/;
+      const descriptionRegex = /:(.*?)<\/p>/;
+      const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
       for (const item of listItems) {
         const id = item.match(idRegex)[1];
         const name = item.match(nameRegex)[1];
@@ -46,7 +48,7 @@ class GogoanimePluginOld {
         });
       }
       return {
-        name: "Gogoanime",
+        name: "Gogoanime (Old)",
         description: `Search results for ${query}`,
         url: decodeURIComponent(
           `${this.baseUrl}/search.html?keyword=${query}&page=${page}`
@@ -68,25 +70,24 @@ class GogoanimePluginOld {
   }
   async getItemDetails(id) {
     const url = `${this.baseUrl}/category/${id}`;
+    // throw new Error(url);
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
       return {};
     }
-    const nameRegex = /<h1>(.*?)<\/h1>/;
+    const nameRegex = /<h1>([\s\S]*?)<\/h1>/;
     const name = response.match(nameRegex)[1].trim();
-    const descriptionRegex =
-      /<p class="type">[\s\S]*?<span>Type:.*<\/span>[\s\s]*?<a href=.*>(.*)<\/a>/;
+    const descriptionRegex = /Type:[\s\S]*?title="(.*)"/;
     const description = response.match(descriptionRegex)[1].trim();
-    const imageUrlRegex =
-      /<div class="anime_info_body_bg">[\s\S]*?<img src="(.*?)"/;
+    const imageUrlRegex = /anime_info_body_bg">[\s\S]*?<img[\s\S]*?src="(.*?)"/;
     var imageUrl = response.match(imageUrlRegex)[1];
     if (imageUrl.startsWith("/")) {
       imageUrl = `${this.baseUrl}/${imageUrl}`;
     }
-    const language = name.includes("(Dub)") ? "English" : "Japanese";
-    const synopsisRegex = /<div class="description">([\s\S]*?)<\/div>/;
+    const language = name.includes("(Dub)") ? "English" : "Sub";
+    const synopsisRegex = /Synopsis: ([\s\S]*?)<\/div>/;
     var synopsis = response.match(synopsisRegex)[1].trim();
     const openingTagRegex = /<.*?>/g;
     synopsis = synopsis.replace(openingTagRegex, "");
@@ -95,7 +96,7 @@ class GogoanimePluginOld {
     const genres = [];
     const genresElementRegex = /Genre:.*<\/span>[\s\S]*?<\/p>/;
     const genresElement = response.match(genresElementRegex)[0];
-    const genresRegex = /<a href="(.*?)" title="(.*?)">.*?/g;
+    const genresRegex = /<a[\s\S]*?href='(.*?)'[\s\S]*?title='(.*?)'/g;
     const genresList = [...genresElement.matchAll(genresRegex)];
     for (const genre of genresList) {
       if (genre[1].startsWith("/")) {
@@ -110,61 +111,30 @@ class GogoanimePluginOld {
         url: genre[1].startsWith("/") ? this.baseUrl + genre[1] : genre[1],
       });
     }
-    const releaseDateRegex =
-      /<p class="type">[\s\S]*<span>Released:[\s\S]*?<\/span>(.*?)<\/p>/;
+    const releaseDateRegex = /Released:[\s\S]*?<\/span>(.*?)<\/p>/;
     const releaseDate = response.match(releaseDateRegex)[1].trim();
-    const statusRegex =
-      /Status:[\s\S]*?<\/span>[\s\S]*?<a href=".*?">(.*?)<\/a>/;
+    const statusRegex = /Status:[\s\S]*?title=".*">(.*?)</;
     const status = response.match(statusRegex)[1].trim();
-    const ohterNamesRegex =
-      /<p class="type other-name">[\s\S]*<span>Other name:[\s\S]*?<\/span>[\s\S]*?<a.* title="(.*?)<\/a>[\s\S]*?<\/p>/;
+    const ohterNamesRegex = /Other name:[\s\S]*?>([\s\S]*?)</;
     const otherNames = response.match(ohterNamesRegex)[1].trim().split(",");
-    const lastEpisodeNumber = 10000;
-    const movieIdRegex = /value="(.*?)" id="movie_id" class="movie_id"/;
-    const movieId = response.match(movieIdRegex)[1];
-    const defaultEpRegex = /value="(.*?)" id="default_ep" class="default_ep"/;
-    const defaultEp = response.match(defaultEpRegex)[1];
-    const aliasRegex = /value="(.*?)" id="alias_anime" class="alias_anime"/;
-    const alias = response.match(aliasRegex)[1];
     const episodes = [];
-    // const episodesUrl = `${this.ajaxUrl}/ajax/load-list-episode?ep_start=0&ep_end=${lastEpisodeNumber}&id=${movieId}&default_ep=${defaultEp}&alias=${alias}`;
-    // const episodesResponse = await fetch(episodesUrl)
-    //   .then((response) => response)
-    //   .then((data) => data.text());
-    // if (!episodesResponse) {
-    //   return {
-    //     id: id,
-    //     name: name,
-    //     description: description,
-    //     imageUrl: imageUrl,
-    //     url: url,
-    //     type: this.sourceType,
-    //     language: language,
-    //     synopsis: synopsis,
-    //     genres: genres,
-    //     media: episodes,
-    //     releaseDate: releaseDate,
-    //     status: status,
-    //     otherNames: otherNames,
-    //   };
-    // } else {
-    //   const episodesRegex =
-    //     /<a href="([\s\S* ]*?)"[\s\S]*?class.*>[\s\S]*?<div class="name"><span>(.*?)<\/span>([\s\S]*?)<\/div>[\s\S]*?<div class="cate">(.*)?<\/div>/g;
-    //   const episodesList = [...episodesResponse.matchAll(episodesRegex)];
-    //   for (const episode of episodesList) {
-    //     episodes.push({
-    //       id: episode[1].split("/").pop(),
-    //       name: `${episode[2]} ${episode[3]}`.trim(),
-    //       url: episode[1].startsWith("/")
-    //         ? this.baseUrl + episode[1]
-    //         : episode[1],
-    //       language:
-    //         episode[4].trim().toLowerCase() === "english"
-    //           ? "English"
-    //           : "Japanese",
-    //       number: parseInt(episode[3].trim()),
-    //     });
-    //   }
+    const episodesRegex =
+      /<li>[\s\S]*?<a[\s\S]*?href="\/(.*?)"[\s\S]*?span>([\s\S]*?)<\/div[\s\S]*?cate">([\s\S]*?)</g;
+    const episodesList = [...response.matchAll(episodesRegex)];
+    for (const episode of episodesList) {
+      episodes.push({
+        id: episode[1].trim(),
+        name: episode[2]
+          .replace(openingTagRegex, "")
+          .replace(closingTagRegex, "")
+          .trim(),
+        url: this.baseUrl + "/" + episode[1],
+        language: episode[3].trim().toLowerCase() === "dub" ? "English" : "Sub",
+        number: parseInt(
+          episode[2] === "Movie" ? "0" : episode[2].trim().split(" ")[1]
+        ),
+      });
+    }
     return {
       id: id,
       name: name,
@@ -181,61 +151,6 @@ class GogoanimePluginOld {
       otherNames: otherNames,
     };
   }
-  //   }
-  // async vidHideExtractor(url) {
-
-  //         const response = await fetch(url, {
-  //             headers: {
-  //                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
-  //                 Referer: url,
-  //             },
-  //         })
-  //             .then(response => response)
-  //             .then(data => data.text());
-  //         if (!response) {
-  //             return null;
-  //         }
-  //         const scriptRegex = /eval([\s\S]*?)<\/script>/;
-  //         const script = response.match(scriptRegex)[1];
-  //         const urlSchemeRegex = /http./;
-  //         var urlScheme = script.match(urlSchemeRegex)[0];
-  //         if (urlScheme.endsWith('|')) {
-  //             urlScheme = urlScheme.slice(0, -1);
-  //         }
-  //         const sAndFRegex = /data\|+([0-9]*)\|+([0-9]*)/;
-  //         const s = script.match(sAndFRegex)[1];
-  //         const f = script.match(sAndFRegex)[2];
-  //         const srvRegex = /file\|+[0-9]*\|(.*?)\|/;
-  //         const srv = script.match(srvRegex)[1];
-  //         const iRegex = /i=([0-9\.]*)&/;
-  //         const i = script.match(iRegex)[1];
-  //         const asnRegex = /text\|+([0-9]*)\|/;
-  //         const asn = script.match(asnRegex)[1];
-  //         const domainEndRegex = /logo\|+(.*?)\|/;
-  //         const domainEnd = script.match(domainEndRegex)[1];
-  //         const infoChunkStart = script.split('|width|')[1];
-  //         const infoChunkEnd = infoChunkStart.split('|sources|')[0];
-  //         const infoChunkSplit = infoChunkEnd.split('|').reverse();
-  //         const infoChunkOffset = infoChunkSplit[2] === 'hls2' ? 0 : 1;
-  //         const m3u8Index = infoChunkSplit.indexOf('m3u8');
-  //         const origin = `${urlScheme}://${infoChunkSplit[0]}.${infoChunkSplit[1]}${infoChunkOffset === 0 ? '' : '-' + infoChunkSplit[2]}.${domainEnd}/${infoChunkSplit[infoChunkOffset + 2]}`;
-  //         var urlset = '/';
-  //         if (origin.includes('urlset')) {
-  //             urlset = ',l,n,h,.urlset/';
-  //         }
-  //         var t;
-  //         var e;
-  //         if (infoChunkSplit[m3u8Index + 2] === '129600') {
-  //             t = infoChunkSplit[m3u8Index + 1];
-  //             e = infoChunkSplit[m3u8Index + 2];
-  //         }
-  //         else {
-  //             t = infoChunkSplit[m3u8Index + 2] + '-' + infoChunkSplit[m3u8Index + 1];
-  //             e = infoChunkSplit[m3u8Index + 3];
-  //         }
-  //         const videoUrl = `${origin}/${infoChunkSplit[infoChunkOffset + 3]}/${infoChunkSplit[infoChunkOffset + 4]}/${infoChunkSplit[infoChunkOffset + 5]}${urlset}master.m3u8?t=${t}&s=${s}&e=129600&f=${f}&srv=${srv}&i=${i}&sp=${infoChunkSplit[infoChunkSplit.indexOf('sp') + 1]}&p1=${srv}&p2=${srv}&asn=${asn}`;
-  //         return videoUrl;
-  // }
   async getItemMedia(id) {
     const episodePageResponse = await fetch(`${this.baseUrl}/${id}`)
       .then((response) => response)
@@ -243,23 +158,20 @@ class GogoanimePluginOld {
     if (!episodePageResponse) {
       return [];
     }
-    const allUlRegex = /<ul>[\s\S]*?<\/ul>/g;
-    const ul = [...episodePageResponse.matchAll(allUlRegex)].filter((item) =>
-      item[0].includes("data-video")
-    );
-    if (ul.length !== 1) {
-      return [];
-    }
-    const ulText = ul[0][0];
+    const ulRegex = /<li[\s\S]*?class="anime">([\s\S]*?)<\/ul>/;
+    const ul = episodePageResponse.match(ulRegex)[1];
     const embedInfoRegex =
-      /<li class=".*">[\s\S]*?<a.*data-video="(.*?)".*>[\s\S]*?<i class="iconlayer-(.*?)">?<\/i>(.*)<span>/g;
-    const embedInfoList = [...ulText.matchAll(embedInfoRegex)].map((item) => ({
-      type: "ExtractorVideo",
-      url: new URL(item[1]),
-      name: item[3],
-      iconUrl: `${this.baseUrl}img/${item[2]}.png`,
-    }));
-    return embedInfoList;
+      /<a[\s\S]*?data-video="(.*?)"[\s\S]*?\/i>([\s\S]*?)</g;
+    const embedInfoList = [...ul.matchAll(embedInfoRegex)];
+    const sources = [];
+    for (const item of embedInfoList) {
+      sources.push({
+        type: "ExtractorVideo",
+        url: item[1].startsWith("//") ? `https:${item[1]}` : item[1],
+        name: item[2].trim(),
+      });
+    }
+    return sources;
   }
 }
 

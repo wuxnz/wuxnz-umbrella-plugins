@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // @ts-ignore
 var GogoanimePlugin = require("./plugins/gogoanime/GogoanimePlugin");
-var plugins = [GogoanimePlugin]; //, GogoanimePluginOld];
+// @ts-ignore
+var GogoanimePluginOld = require("./plugins/gogoanime-old/GoganimePluginOld");
+var plugins = [GogoanimePlugin, GogoanimePluginOld];
 function testPlugin(plugin) {
     try {
         plugin.search("one", 1).then(function (res) {
