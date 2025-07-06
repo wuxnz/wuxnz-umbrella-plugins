@@ -8,7 +8,7 @@
   "iconUrl": "https://gogoanimez.to/wp-content/uploads/2025/05/cropped-gogoanime-icon-192x192.webp",
   "manifestUrl": "https://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime/GogoanimePluginManifest.json",
   "pluginUrl": "https://wuxnz.github.io/wuxnz-umbrella-plugins/plugins/gogoanime/GogoanimePlugin.js",
-  "bannerImageUrl": "https://gogoanimez.to/wp-content/uploads/2025/05/Picsart_24-11-23_17-38-10-572.png",
+  "bannerImageUrl": "https://gogoanimez.to/wp-content/uploads/2025/07/Picsart_24-11-23_17-38-10-572-1.png",
   "changelog": "Fixed search for Gogoanime, added item details",
   "readme": "This is a plugin that allows you to scrape Gogoanime for Umbrella.",
   "license": "MIT"
