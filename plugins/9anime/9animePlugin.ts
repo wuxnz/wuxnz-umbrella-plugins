@@ -8,14 +8,14 @@ class ExamplePlugin {
   async search(query: string, page?: number) {
     var baseUrl = this.baseUrl;
     const url = `${baseUrl}/search?keyword=${query}&page=${page || 1}`;
-    const response = fetch(url)
+    const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
-      throw new Error(`${response}`);
+      // throw new Error(`${response}`);
       return {};
     }
-    throw new Error(`Past: ${response}`);
+    // throw new Error(`Past: ${response}`);
     // @ts-expect-error
     const $ = Cheerio.load(response); // as CheerioAPI;
     var items = [];
@@ -23,7 +23,7 @@ class ExamplePlugin {
     $(".flw-item").each(function () {
       var item = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
-      throw new Error(`${item["id"]}`);
+      // throw new Error(`${item["id"]}`);
       item["name"] = $(this).find(".title").text().trim();
       item["description"] = $(`#qtip-${index}-content`)
         ._findBySelector("div:nth-child(1) > div:nth-child(7)", 1)
