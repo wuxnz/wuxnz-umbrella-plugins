@@ -1,6 +1,6 @@
-import { Cheerio, CheerioAPI } from "cheerio";
+// import { Cheerio, CheerioAPI } from "cheerio";
 
-const cheerio = require("cheerio");
+// const cheerio = require("cheerio");
 
 class ExamplePlugin {
   baseUrl = "https://9animetv.to";
@@ -14,7 +14,8 @@ class ExamplePlugin {
     if (!response) {
       return {};
     }
-    const $ = cheerio.load(response) as CheerioAPI;
+    // @ts-expect-error
+    const $ = Cheerio.load(response); // as CheerioAPI;
     var items = [];
     var index = 0;
     $(".flw-item").each(function () {
