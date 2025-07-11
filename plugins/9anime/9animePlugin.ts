@@ -21,7 +21,7 @@ class ExamplePlugin {
     $(".flw-item").each(function () {
       var item = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
-      throw new Error(`${item["id"]}`);
+      // throw new Error(`${item["id"]}`);
       item["name"] = $(this).find(".title").text().trim();
       item["description"] = $(`#qtip-${index}-content`)
         ._findBySelector("div:nth-child(1) > div:nth-child(7)", 1)
