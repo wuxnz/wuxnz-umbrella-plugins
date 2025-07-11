@@ -22,13 +22,13 @@ class ExamplePlugin {
       var item = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
       // throw new Error(`${item["id"]}`);
-      item["name"] = $(this).find(".title").text().trim();
+      item["name"] = $(this).find(".dynamic-name").text().trim();
       item["description"] = $(
         `#qtip-${index}-content > div:nth-child(1) > div:nth-child(7)`
       )
         .text()
         .trim();
-      item["imageUrl"] = $(this).find("img").attr("src");
+      item["imageUrl"] = $(this).find("img").attr("data-src");
       item["url"] = $(this).find("a").attr("href").startsWith("/")
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
