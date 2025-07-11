@@ -69,7 +69,9 @@ class GogoanimePluginOld {
                     // throw new Error(`${item["id"]}`);
                     item["name"] = $(this).find(".name a").text().trim();
                     item["description"] = $(`this`).find(".released").text().trim();
-                    item["imageUrl"] = $(this).find("img").attr("src");
+                    item["imageUrl"] = $(this).find("img").attr("src").startsWith("/")
+                        ? `${baseUrl}${$(this).find("img").attr("src")}`
+                        : $(this).find("img").attr("src");
                     item["url"] = $(this).find("a").attr("href").startsWith("/")
                         ? `${baseUrl}${$(this).find("a").attr("href")}`
                         : $(this).find("a").attr("href");
