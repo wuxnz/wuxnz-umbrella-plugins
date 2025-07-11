@@ -11,42 +11,59 @@ class GogoanimePluginOld {
   sourceType = "Video";
   async search(query, page) {
     try {
-      const url = `${this.baseUrl}/search?keyword=${query}&page=${page || 1}`;
+      var baseUrl = this.baseUrl;
+      const url = `${baseUrl}/search?keyword=${query}&page=${page || 1}`;
       const response = await fetch(url)
         .then((response) => response)
         .then((data) => data.text());
       if (!response) {
         return {};
       }
-      const ulRegex = /<ul.*class="items".*>([\s\S]*?)<\/ul>/;
-      const listUl = response.match(ulRegex)[1];
-      const listItemsRegex = /<li>([\s\S]*?)<\/li>/g;
-      const listItems = [...listUl.matchAll(listItemsRegex)].map(
-        (item) => item[1]
-      );
+      // const ulRegex = /<ul.*class="items".*>([\s\S]*?)<\/ul>/;
+      // const listUl = response.match(ulRegex)[1];
+      // const listItemsRegex = /<li>([\s\S]*?)<\/li>/g;
+      // const listItems = [...listUl.matchAll(listItemsRegex)].map(
+      //   (item) => item[1]
+      // );
+      // const items = [];
+      // const idRegex = /<a[\s\S]*?href="\/category\/(.*?)"[\s\S]*?title=".*?">/;
+      // const nameRegex =
+      //   /<a[\s\S]*?href="\/category\/.*?"[\s\S]*?title="(.*?)">/;
+      // const descriptionRegex = /:(.*?)<\/p>/;
+      // const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
+      // for (const item of listItems) {
+      //   const id = item.match(idRegex)[1];
+      //   const name = item.match(nameRegex)[1];
+      //   const description = item.match(descriptionRegex)[1].trim();
+      //   var imageUrl = item.match(imageUrlRegex)[1];
+      //   if (imageUrl.startsWith("/")) {
+      //     imageUrl = `${this.baseUrl}/${imageUrl}`;
+      //   }
+      //   items.push({
+      //     id,
+      //     name,
+      //     description,
+      //     imageUrl,
+      //     url: url,
+      //     type: this.sourceType,
+      //   });
+      // }
       const items = [];
-      const idRegex = /<a[\s\S]*?href="\/category\/(.*?)"[\s\S]*?title=".*?">/;
-      const nameRegex =
-        /<a[\s\S]*?href="\/category\/.*?"[\s\S]*?title="(.*?)">/;
-      const descriptionRegex = /:(.*?)<\/p>/;
-      const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
-      for (const item of listItems) {
-        const id = item.match(idRegex)[1];
-        const name = item.match(nameRegex)[1];
-        const description = item.match(descriptionRegex)[1].trim();
-        var imageUrl = item.match(imageUrlRegex)[1];
-        if (imageUrl.startsWith("/")) {
-          imageUrl = `${this.baseUrl}/${imageUrl}`;
-        }
-        items.push({
-          id,
-          name,
-          description,
-          imageUrl,
-          url: url,
-          type: this.sourceType,
-        });
-      }
+      // @ts-expect-error
+      const $ = Cheerio.load(response);
+      $(".items li").each(function () {
+        var item = {};
+        item["id"] = $(this).find("a").attr("href").split("/")[2];
+        // throw new Error(`${item["id"]}`);
+        item["name"] = $(this).find(".name a").text().trim();
+        item["description"] = $(`this`).find(".released").text().trim();
+        item["imageUrl"] = $(this).find("img").attr("src");
+        item["url"] = $(this).find("a").attr("href").startsWith("/")
+          ? `${baseUrl}${$(this).find("a").attr("href")}`
+          : $(this).find("a").attr("href");
+        item["type"] = "Video";
+        items.push(item);
+      });
       return {
         name: "Gogoanime (Old)",
         description: `Search results for ${query}`,
