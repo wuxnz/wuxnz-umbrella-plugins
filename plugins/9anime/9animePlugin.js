@@ -23,8 +23,10 @@ class ExamplePlugin {
                 .then((response) => response)
                 .then((data) => data.text());
             if (!response) {
+                throw new Error(`${response}`);
                 return {};
             }
+            throw new Error(`Past: ${response}`);
             // @ts-expect-error
             const $ = Cheerio.load(response); // as CheerioAPI;
             var items = [];
