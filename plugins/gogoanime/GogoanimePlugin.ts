@@ -13,6 +13,7 @@ class GogoanimePlugin {
   async search(query, page) {
     try {
       const pageNum = page || 1;
+
       const url = `${this.baseUrl}/page/${pageNum}/?s=${query}`;
       const response = await fetch(url)
         .then((response) => response)
