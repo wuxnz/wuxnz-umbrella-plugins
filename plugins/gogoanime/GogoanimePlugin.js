@@ -31,47 +31,67 @@ class GogoanimePlugin {
                 if (!response) {
                     return {};
                 }
-                const ulRegex = /listupd">([\s\S]*<\/article>)/;
-                var listUl;
-                try {
-                    listUl = response.match(ulRegex)[1];
-                }
-                catch (error) {
-                    console.log(error);
-                    return {
-                        name: "Gogoanime",
-                        description: `Search results for ${query}`,
-                        url: decodeURIComponent(`${this.baseUrl}/page/${pageNum}/?s=${query}`),
-                        isPaginated: true,
-                        nextPageNumber: page + 1,
-                        previousPageNumber: page > 1 ? page - 1 : undefined,
-                        items: [],
-                    };
-                }
-                const listItemsRegex = /<article[\s\S]*?>([\s\S]*?)<\/article>/g;
-                const listItems = [...listUl.matchAll(listItemsRegex)].map((item) => item[1]);
-                const items = [];
-                const idRegex = /<a[\s\S]*?href=".*\/anime\/(.*?)\/"/;
-                const nameRegex = /url"[\s\S]*?title="([\s\S]*?)"/;
-                const descriptionRegex = /limit">[\s\S]*?>([\s\S]*?)</;
-                const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
-                for (const item of listItems) {
-                    const id = item.match(idRegex)[1];
-                    const name = item.match(nameRegex)[1].replace(/&.*?;/g, "");
-                    // throw new Error(name);
-                    const description = item.match(descriptionRegex) === null
-                        ? ""
-                        : item.match(descriptionRegex)[1];
-                    var imageUrl = item.match(imageUrlRegex)[1];
-                    items.push({
-                        id,
-                        name,
-                        description,
-                        imageUrl,
-                        url: url,
-                        type: this.sourceType,
-                    });
-                }
+                // const ulRegex = /listupd">([\s\S]*<\/article>)/;
+                // var listUl;
+                // try {
+                //   listUl = response.match(ulRegex)[1];
+                // } catch (error) {
+                //   console.log(error);
+                //   return {
+                //     name: "Gogoanime",
+                //     description: `Search results for ${query}`,
+                //     url: decodeURIComponent(
+                //       `${this.baseUrl}/page/${pageNum}/?s=${query}`
+                //     ),
+                //     isPaginated: true,
+                //     nextPageNumber: page + 1,
+                //     previousPageNumber: page > 1 ? page - 1 : undefined,
+                //     items: [],
+                //   };
+                // }
+                // const listItemsRegex = /<article[\s\S]*?>([\s\S]*?)<\/article>/g;
+                // const listItems = [...listUl.matchAll(listItemsRegex)].map(
+                //   (item) => item[1]
+                // );
+                // const items = [];
+                // const idRegex = /<a[\s\S]*?href=".*\/anime\/(.*?)\/"/;
+                // const nameRegex = /url"[\s\S]*?title="([\s\S]*?)"/;
+                // const descriptionRegex = /limit">[\s\S]*?>([\s\S]*?)</;
+                // const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
+                // for (const item of listItems) {
+                //   const id = item.match(idRegex)[1];
+                //   const name = item.match(nameRegex)[1].replace(/&.*?;/g, "");
+                //   // throw new Error(name);
+                //   const description =
+                //     item.match(descriptionRegex) === null
+                //       ? ""
+                //       : item.match(descriptionRegex)[1];
+                //   var imageUrl = item.match(imageUrlRegex)[1];
+                //   items.push({
+                //     id,
+                //     name,
+                //     description,
+                //     imageUrl,
+                //     url: url,
+                //     type: this.sourceType,
+                //   });
+                // }
+                // @ts-expect-error
+                const $ = Cheerio.load(response);
+                var items = [];
+                $(".bs").each(function () {
+                    var item = {};
+                    item["id"] = $(this).find("a").attr("href").split("/")[2];
+                    // throw new Error(`${item["id"]}`);
+                    item["name"] = $(this).find("div.tt").text().split("<")[0].trim();
+                    item["description"] = $(this).find(".typez").text().trim();
+                    item["imageUrl"] = $(this).find("img").attr("src");
+                    item["url"] = $(this).find("a").attr("href").startsWith("/")
+                        ? `${this.baseUrl}${$(this).find("a").attr("href")}`
+                        : $(this).find("a").attr("href");
+                    item["type"] = "Video";
+                    items.push(item);
+                });
                 return {
                     name: "Gogoanime",
                     description: `Search results for ${query}`,
