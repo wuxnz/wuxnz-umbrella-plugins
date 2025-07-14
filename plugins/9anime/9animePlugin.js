@@ -1,4 +1,5 @@
 "use strict";
+// import { Cheerio, CheerioAPI } from "cheerio";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const cheerio = require("cheerio");
+// const cheerio = require("cheerio");
 class ExamplePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -24,7 +25,8 @@ class ExamplePlugin {
             if (!response) {
                 return {};
             }
-            const $ = cheerio.load(response); // as CheerioAPI;
+            // @ts-expect-error
+            const $ = Cheerio.load(response); // as CheerioAPI;
             var items = [];
             var index = 0;
             $(".flw-item").each(function () {
@@ -73,7 +75,8 @@ class ExamplePlugin {
             if (!response) {
                 return {};
             }
-            const $ = cheerio.load(response);
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
             const name = $("h2.film-name").text().trim();
             const imageUrl = $(".anime-poster > div:nth-child(1) > img:nth-child(1)").attr("src");
             const synopsis = $(".shorting").text().trim();
@@ -146,11 +149,7 @@ class ExamplePlugin {
             }
             var otherNames = $(".alias").text().trim().split(", ");
             var episodes = [];
-            const episodeResponse = yield fetch(`${baseUrl}/ajax/episode/list/${id.split("-")[id.split("-").length - 1]}`, {
-                headers: {
-                    Referer: url,
-                },
-            })
+            const episodeResponse = yield fetch(`${baseUrl}/ajax/episode/list/${id.split("-")[id.split("-").length - 1]}`)
                 .then((response) => response)
                 .then((data) => data.json());
             if (episodeResponse.status === true) {
@@ -204,12 +203,7 @@ class ExamplePlugin {
             for (const server of servers) {
                 var source = {};
                 const serverUrl = `${baseUrl}/ajax/episode/sources?id=${server.id}`;
-                const serverResponse = yield fetch(serverUrl, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36",
-                        Referer: baseUrl + id,
-                    },
-                })
+                const serverResponse = yield fetch(serverUrl)
                     .then((response) => response)
                     .then((data) => data.json());
                 if (serverResponse.link != null &&
