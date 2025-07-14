@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // const cheerio = require("cheerio");
-class ExamplePlugin {
+class NineAnimePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
     }
@@ -220,10 +220,10 @@ class ExamplePlugin {
     }
 }
 module.exports = {
-    search: (query, page) => __awaiter(void 0, void 0, void 0, function* () { return new ExamplePlugin().search(query, page); }),
-    getCategory: (category, page) => __awaiter(void 0, void 0, void 0, function* () { return new ExamplePlugin().getCategory(category, page); }),
-    getHomeCategories: () => __awaiter(void 0, void 0, void 0, function* () { return new ExamplePlugin().getHomeCategories(); }),
-    getItemDetails: (id) => __awaiter(void 0, void 0, void 0, function* () { return new ExamplePlugin().getItemDetails(id); }),
-    getItemMedia: (id) => __awaiter(void 0, void 0, void 0, function* () { return new ExamplePlugin().getItemMedia(id); }),
+    search: (query, page) => __awaiter(void 0, void 0, void 0, function* () { return new NineAnimePlugin().search(query, page); }),
+    getCategory: (category, page) => __awaiter(void 0, void 0, void 0, function* () { return new NineAnimePlugin().getCategory(category, page); }),
+    getHomeCategories: () => __awaiter(void 0, void 0, void 0, function* () { return new NineAnimePlugin().getHomeCategories(); }),
+    getItemDetails: (id) => __awaiter(void 0, void 0, void 0, function* () { return new NineAnimePlugin().getItemDetails(id); }),
+    getItemMedia: (id) => __awaiter(void 0, void 0, void 0, function* () { return new NineAnimePlugin().getItemMedia(id); }),
 };
-exports.default = ExamplePlugin;
+exports.default = NineAnimePlugin;

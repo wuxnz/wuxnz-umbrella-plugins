@@ -2,7 +2,7 @@
 
 // const cheerio = require("cheerio");
 
-class ExamplePlugin {
+class NineAnimePlugin {
   baseUrl = "https://9animetv.to";
 
   async search(query: string, page?: number) {
@@ -237,15 +237,15 @@ class ExamplePlugin {
 
 module.exports = {
   search: async (query: string, page?: number): Promise<object> =>
-    new ExamplePlugin().search(query, page),
+    new NineAnimePlugin().search(query, page),
   getCategory: async (category: string, page?: number): Promise<object> =>
-    new ExamplePlugin().getCategory(category, page),
+    new NineAnimePlugin().getCategory(category, page),
   getHomeCategories: async (): Promise<object[]> =>
-    new ExamplePlugin().getHomeCategories(),
+    new NineAnimePlugin().getHomeCategories(),
   getItemDetails: async (id: string): Promise<object> =>
-    new ExamplePlugin().getItemDetails(id),
+    new NineAnimePlugin().getItemDetails(id),
   getItemMedia: async (id: string): Promise<object[]> =>
-    new ExamplePlugin().getItemMedia(id),
+    new NineAnimePlugin().getItemMedia(id),
 };
 
-export default ExamplePlugin;
+export default NineAnimePlugin;
