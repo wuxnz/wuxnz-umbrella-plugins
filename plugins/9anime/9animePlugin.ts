@@ -172,8 +172,8 @@ class ExamplePlugin {
         episodes.push({
           id: item[1].split("/")[2],
           name: item[2].trim(),
-          type: "ExtractorVideo",
           url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
+          language: "Unknown",
           number: Number(item[3].trim()),
         });
       });
