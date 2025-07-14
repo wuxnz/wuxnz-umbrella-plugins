@@ -1,9 +1,11 @@
-// @ts-ignore
+// @ts-expect-error
 import * as GogoanimePlugin from "./plugins/gogoanime/GogoanimePlugin";
-// @ts-ignore
+// @ts-expect-error
 import * as GogoanimePluginOld from "./plugins/gogoanime-old/GoganimePluginOld";
 
-const plugins = [GogoanimePlugin, GogoanimePluginOld];
+import * as NineAnimePlugin from "./plugins/9anime/9animePlugin";
+
+const plugins = [NineAnimePlugin];
 
 function testPlugin(plugin: any) {
   try {

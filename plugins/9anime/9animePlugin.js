@@ -1,5 +1,4 @@
 "use strict";
-// import { Cheerio, CheerioAPI } from "cheerio";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const cheerio = require("cheerio");
+const cheerio = require("cheerio");
 class ExamplePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -25,14 +24,12 @@ class ExamplePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response); // as CheerioAPI;
+            const $ = cheerio.load(response); // as CheerioAPI;
             var items = [];
             var index = 0;
             $(".flw-item").each(function () {
                 var item = {};
                 item["id"] = $(this).find("a").attr("href").split("/")[2];
-                // throw new Error(`${item["id"]}`);
                 item["name"] = $(this).find(".dynamic-name").text().trim();
                 item["description"] = $(`#qtip-${index}-content > div:nth-child(1) > div:nth-child(7)`)
                     .text()
@@ -68,12 +65,163 @@ class ExamplePlugin {
     }
     getItemDetails(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return {};
+            const baseUrl = this.baseUrl;
+            const url = `${baseUrl}/watch/${id}`;
+            const response = yield fetch(url)
+                .then((response) => response)
+                .then((data) => data.text());
+            if (!response) {
+                return {};
+            }
+            const $ = cheerio.load(response);
+            const name = $("h2.film-name").text().trim();
+            const imageUrl = $(".anime-poster > div:nth-child(1) > img:nth-child(1)").attr("src");
+            const synopsis = $(".shorting").text().trim();
+            var related = [];
+            $(".cbox-collapse > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li").each(function () {
+                var item = {};
+                item["id"] = $(this).find("a").attr("href").split("/")[2];
+                item["name"] = $(this).find("a").text().trim();
+                item["description"] = $(this).find("span").text().trim();
+                item["imageUrl"] = $(this).find("img").attr("data-src");
+                item["url"] = $(this).find("a").attr("href").startsWith("/")
+                    ? `${baseUrl}${$(this).find("a").attr("href")}`
+                    : $(this).find("a").attr("href");
+                item["type"] = "Video";
+                related.push(item);
+            });
+            const metaInfos = $(".col1 > div");
+            const description = metaInfos
+                .filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "type:");
+            })
+                .find(".item-content")
+                .text()
+                .trim();
+            var genres = [];
+            var genresElement = metaInfos.filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "genre:");
+            });
+            if (genresElement.length > 0) {
+                genresElement.find(".item-content > a").each(function () {
+                    var genre = {};
+                    genre["id"] = $(this).attr("href").split("/")[2];
+                    genre["name"] = $(this).text().trim();
+                    genre["url"] = $(this).attr("href").startsWith("/")
+                        ? `${baseUrl}${$(this).attr("href")}`
+                        : $(this).attr("href");
+                    genre["isPaginated"] = true;
+                    genre["nextPageNumber"] = 1;
+                    genre["previousPageNumber"] = undefined;
+                    genres.push(genre);
+                });
+            }
+            var releaseDate;
+            const releaseDateElement = metaInfos.filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "premiered:");
+            });
+            if (releaseDateElement.length > 0) {
+                releaseDate = releaseDateElement.find(".item-content").text().trim();
+            }
+            var rating;
+            const ratingElement = metaInfos.filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "scores:");
+            });
+            if (ratingElement.length > 0) {
+                rating = ratingElement.find(".item-content").text().trim();
+            }
+            var creators;
+            const creatorsElement = metaInfos.filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "studios:");
+            });
+            if (creatorsElement.length > 0) {
+                creators = creatorsElement.find(".item-content").text().trim();
+            }
+            var status;
+            const statusElement = metaInfos.filter(function () {
+                return ($(this).find(".item-title").text().trim().toLowerCase() == "status:");
+            });
+            if (statusElement.length > 0) {
+                status = statusElement.find(".item-content").text().trim();
+            }
+            var otherNames = $(".alias").text().trim().split(", ");
+            var episodes = [];
+            const episodeResponse = yield fetch(`${baseUrl}/ajax/episode/list/${id.split("-")[id.split("-").length - 1]}`, {
+                headers: {
+                    Referer: url,
+                },
+            })
+                .then((response) => response)
+                .then((data) => data.json());
+            if (episodeResponse.status === true) {
+                const episodeRegex = /<a.*?href="([\s\S]*?)"[\s\S]*?title="([\s\S]*?)"[\s\S]*?data-number="([\s\S]*?)[\s\S]*?data-id="([\s\S]*?)">/g;
+                [...episodeResponse.html.matchAll(episodeRegex)].map(function (item) {
+                    episodes.push({
+                        id: item[1].split("/")[2],
+                        name: item[2].trim(),
+                        type: "ExtractorVideo",
+                        url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
+                        number: Number(item[3].trim()),
+                    });
+                });
+            }
+            return {
+                id: id,
+                name: name,
+                description: description,
+                imageUrl: imageUrl,
+                url: url,
+                type: "Video",
+                language: "Unknown",
+                synopsis: synopsis,
+                related: related,
+                genres: genres,
+                media: episodes,
+                releaseDate: releaseDate,
+                rating: rating,
+                creators: creators,
+                status: status,
+                otherNames: otherNames,
+            };
         });
     }
     getItemMedia(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return [];
+            const baseUrl = this.baseUrl;
+            const serversUrl = `${baseUrl}/ajax/episode/servers?episodeId=${id.split("ep=")[id.split("ep=").length - 1]}`;
+            const serversResponse = yield fetch(serversUrl)
+                .then((response) => response)
+                .then((data) => data.json());
+            const serversRegex = /<div[\s\S]*?server-item"[\s\S]*?data-type="([\s\S]*?)"[\s\S]*?data-id="([\s\S]*?)[\s\S]*?<a[\s\S]*?class="btn">([\s\S]*?)</g;
+            const servers = [...serversResponse.html.matchAll(serversRegex)].map(function (item) {
+                return {
+                    language: item[1].trim(),
+                    id: item[2].trim(),
+                    name: item[3].trim(),
+                };
+            });
+            var sources = [];
+            for (const server of servers) {
+                var source = {};
+                const serverUrl = `${baseUrl}/ajax/episode/sources?id=${server.id}`;
+                const serverResponse = yield fetch(serverUrl, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36",
+                        Referer: baseUrl + id,
+                    },
+                })
+                    .then((response) => response)
+                    .then((data) => data.json());
+                if (serverResponse.link != null &&
+                    serverResponse.link != undefined &&
+                    serverResponse.link != "") {
+                    source["type"] = "ExtractorVideo";
+                    source["url"] = serverResponse.link;
+                    source["name"] = server.name + " - " + server.language;
+                    sources.push(source);
+                }
+            }
+            return sources;
         });
     }
 }
