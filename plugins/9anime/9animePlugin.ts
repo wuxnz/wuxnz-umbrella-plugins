@@ -60,8 +60,7 @@ class NineAnimePlugin {
       return [];
     }
     // @ts-expect-error
-    const $t = Cheerio.load(response);
-    const $: CheerioAPI = cheerio.load(response);
+    const $ = Cheerio.load(response);
 
     var categories = [];
 

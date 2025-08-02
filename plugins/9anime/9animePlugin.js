@@ -1,5 +1,4 @@
 "use strict";
-// import { Cheerio, CheerioAPI } from "cheerio";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const cheerio = require("cheerio");
+const cheerio = require("cheerio");
 class NineAnimePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -62,7 +61,174 @@ class NineAnimePlugin {
     }
     getHomeCategories() {
         return __awaiter(this, void 0, void 0, function* () {
-            return [];
+            const baseUrl = this.baseUrl;
+            const url = `${baseUrl}/home`;
+            const response = yield fetch(url)
+                .then((response) => response)
+                .then((data) => data.text());
+            if (!response) {
+                return [];
+            }
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
+            var categories = [];
+            categories.push({
+                name: "Featured",
+                description: "9anime featured",
+                url: url,
+                isPaginated: false,
+                items: () => {
+                    var items = [];
+                    $("#slider > div:nth-child(1) > div.swiper-slide").each(function () {
+                        var item = {};
+                        item["id"] = $(this)
+                            .find("div.desi-head-title > a")
+                            .attr("href")
+                            .split("/")[2];
+                        item["name"] = $(this).find("div.desi-head-title > a").text().trim();
+                        item["description"] = $(this)
+                            .find("div.desi-description")
+                            .text()
+                            .trim();
+                        item["imageUrl"] = $(this)
+                            .find("div.deslide-cover-img > img")
+                            .attr("data-src")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this)
+                                .find("div.deslide-cover-img > img")
+                                .attr("data-src")}`
+                            : $(this).find("div.deslide-cover-img > img").attr("data-src");
+                        item["url"] = $(this)
+                            .find("div.desi-head-title > a")
+                            .attr("href")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this)
+                                .find("div.desi-head-title > a")
+                                .attr("href")}`
+                            : $(this).find("div.desi-head-title > a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                },
+            });
+            categories.push({
+                name: $(".block_area-header-tabs > div:nth-child(1) > h2:nth-child(1)")
+                    .text()
+                    .trim(),
+                description: `9anime ${$(".block_area-header-tabs > div:nth-child(1) > h2:nth-child(1)")
+                    .text()
+                    .trim()}`,
+                url: url,
+                isPaginated: false,
+                items: () => {
+                    var items = [];
+                    $(".film_list-wrap > div.flw-item").each(function () {
+                        var item = {};
+                        item["id"] = $(this)
+                            .find("h3.film-name > a")
+                            .attr("href")
+                            .split("/")[2];
+                        item["name"] = $(this).find("h3.film-name > a").text().trim();
+                        item["description"] = $(this)
+                            .find("div.film-poster > div.tick-item")
+                            .text()
+                            .trim();
+                        item["imageUrl"] = $(this)
+                            .find("img")
+                            .attr("data-src")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this).find("img").attr("data-src")}`
+                            : $(this).find("img").attr("data-src");
+                        item["url"] = $(this)
+                            .find("h3.film-name > a")
+                            .attr("href")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
+                            : $(this).find("h3.film-name > a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                },
+            });
+            function parseMultiCategory($) {
+                var categories = [];
+                // var categoryItems = [];
+                $("section.block_area:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div").each(function () {
+                    var category = {};
+                    category["name"] = $(this)
+                        .attr("id")
+                        .split("-")
+                        .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+                        .join(" ");
+                    category["url"] = url;
+                    category["isPaginated"] = false;
+                    category["items"] = $(this)
+                        .find("ul > li")
+                        .map(function () {
+                        var item = {};
+                        item["id"] = $(this).find("a").attr("href").split("/")[2];
+                        item["name"] = $(this).find("a").text().trim();
+                        item["description"] = $(this)
+                            .find("div.fiml-number > span")
+                            .text()
+                            .trim();
+                        item["imageUrl"] = $(this)
+                            .find("img")
+                            .attr("data-src")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this).find("img").attr("data-src")}`
+                            : $(this).find("img").attr("data-src");
+                        item["url"] = $(this).find("a").attr("href").startsWith("/")
+                            ? `${baseUrl}${$(this).find("a").attr("href")}`
+                            : $(this).find("a").attr("href");
+                        item["type"] = "Video";
+                        return item;
+                    });
+                    categories.push(category);
+                });
+                return categories;
+            }
+            categories.push(...parseMultiCategory($));
+            categories.push({
+                name: $("section.block_area_sidebar:nth-child(3) > div:nth-child(1) > div:nth-child(1) > h2:nth-child(1)")
+                    .text()
+                    .trim(),
+                description: `9anime ${$("section.block_area_sidebar:nth-child(3) > div:nth-child(1) > div:nth-child(1) > h2:nth-child(1)")
+                    .text()
+                    .trim()}`,
+                url: url,
+                isPaginated: false,
+                items: () => {
+                    var items = [];
+                    $("ul.ulclear > li").each(function () {
+                        var item = {};
+                        item["id"] = $(this)
+                            .find("h3.film-name > a")
+                            .attr("href")
+                            .split("/")[2];
+                        item["name"] = $(this).find("h3.film-name > a").text().trim();
+                        item["description"] = $(this).find("span.fdi-item").text().trim();
+                        item["imageUrl"] = $(this)
+                            .find("img")
+                            .attr("data-src")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this).find("img").attr("data-src")}`
+                            : $(this).find("img").attr("data-src");
+                        item["url"] = $(this)
+                            .find("h3.film-name > a")
+                            .attr("href")
+                            .startsWith("/")
+                            ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
+                            : $(this).find("h3.film-name > a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                },
+            });
+            return categories;
         });
     }
     getItemDetails(id) {

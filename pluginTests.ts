@@ -46,6 +46,33 @@ function testPlugin(plugin: any) {
         console.log(`❌ Search failed for ${plugin.constructor.name}`);
       }
     });
+    plugin.getHomeCategories().then((categories) => {
+      console.log(`✅ ${categories.length} home categories found.`);
+      console.log(`✅ ${categories[0].items.length} items found.`);
+      console.log("Attempting to get details for first category first item...");
+      try {
+        plugin.getCategoryDetails(categories[0].items[0].id).then((item) => {
+          console.log(`✅ ${item.name} - ${item.description}`);
+          if (item.media.length > 0) {
+            console.log(`✅ ${item.media.length} media found`);
+            console.log("Attempting to get media for first item...");
+            try {
+              plugin.getItemMedia(item.media[0].id).then((media) => {
+                console.log(`✅ ${media.length} media found`);
+              });
+            } catch (error) {
+              console.log(
+                `❌ Media failed for ${categories[0].items[0].id}: ${error}`
+              );
+            }
+          }
+        });
+      } catch (error) {
+        console.log(
+          `❌ Category details failed for ${categories[0].items[0].id}: ${error}`
+        );
+      }
+    });
   } catch (error) {
     console.log(`❌ Search failed for ${plugin.constructor.name}: ${error}`);
   }

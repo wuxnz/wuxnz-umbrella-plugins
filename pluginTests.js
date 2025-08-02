@@ -42,6 +42,31 @@ function testPlugin(plugin) {
                 console.log("\u274C Search failed for ".concat(plugin.constructor.name));
             }
         });
+        plugin.getHomeCategories().then(function (categories) {
+            console.log("\u2705 ".concat(categories.length, " home categories found."));
+            console.log("\u2705 ".concat(categories[0].items.length, " items found."));
+            console.log("Attempting to get details for first category first item...");
+            try {
+                plugin.getCategoryDetails(categories[0].items[0].id).then(function (item) {
+                    console.log("\u2705 ".concat(item.name, " - ").concat(item.description));
+                    if (item.media.length > 0) {
+                        console.log("\u2705 ".concat(item.media.length, " media found"));
+                        console.log("Attempting to get media for first item...");
+                        try {
+                            plugin.getItemMedia(item.media[0].id).then(function (media) {
+                                console.log("\u2705 ".concat(media.length, " media found"));
+                            });
+                        }
+                        catch (error) {
+                            console.log("\u274C Media failed for ".concat(categories[0].items[0].id, ": ").concat(error));
+                        }
+                    }
+                });
+            }
+            catch (error) {
+                console.log("\u274C Category details failed for ".concat(categories[0].items[0].id, ": ").concat(error));
+            }
+        });
     }
     catch (error) {
         console.log("\u274C Search failed for ".concat(plugin.constructor.name, ": ").concat(error));
