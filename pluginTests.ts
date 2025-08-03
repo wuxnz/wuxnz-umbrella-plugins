@@ -7,22 +7,22 @@ import * as NineAnimePlugin from "./plugins/9anime/9animePlugin";
 
 const plugins = [NineAnimePlugin];
 
-function testPlugin(plugin: any) {
+async function testPlugin(plugin: any) {
   try {
-    plugin.search("one", 1).then((res) => {
+    await plugin.search("one", 1).then(async (res) => {
       if (res.name) {
         console.log(`✅ ${res.name} - ${res.description}`);
         if (res.items.length > 0) {
           console.log(`✅ ${res.items.length} items found.`);
           console.log(`Attempting to get details for first item...`);
           try {
-            plugin.getItemDetails(res.items[0].id).then((item) => {
+            await plugin.getItemDetails(res.items[0].id).then(async (item) => {
               console.log(`✅ ${item.name} - ${item.description}`);
               if (item.media.length > 0) {
                 console.log(`✅ ${item.media.length} media found`);
                 console.log("Attempting to get media for first item...");
                 try {
-                  plugin.getItemMedia(item.media[0].id).then((media) => {
+                  await plugin.getItemMedia(item.media[0].id).then((media) => {
                     console.log(`✅ ${media.length} media found`);
                   });
                 } catch (error) {
@@ -46,27 +46,38 @@ function testPlugin(plugin: any) {
         console.log(`❌ Search failed for ${plugin.constructor.name}`);
       }
     });
-    plugin.getHomeCategories().then((categories) => {
+  } catch (error) {
+    console.log(`❌ Search failed for ${plugin.constructor.name}: ${error}`);
+  }
+
+  try {
+    await plugin.getHomeCategories().then(async (categories) => {
       console.log(`✅ ${categories.length} home categories found.`);
       console.log(`✅ ${categories[0].items.length} items found.`);
-      console.log("Attempting to get details for first category first item...");
+      console.log(
+        `Attempting to get details for first category first item ${categories[0].items[0].name}...`
+      );
       try {
-        plugin.getCategoryDetails(categories[0].items[0].id).then((item) => {
-          console.log(`✅ ${item.name} - ${item.description}`);
-          if (item.media.length > 0) {
-            console.log(`✅ ${item.media.length} media found`);
-            console.log("Attempting to get media for first item...");
-            try {
-              plugin.getItemMedia(item.media[0].id).then((media) => {
-                console.log(`✅ ${media.length} media found`);
-              });
-            } catch (error) {
-              console.log(
-                `❌ Media failed for ${categories[0].items[0].id}: ${error}`
-              );
+        await plugin
+          .getItemDetails(categories[0].items[0].id)
+          .then(async (item) => {
+            console.log(`✅ ${item.name} - ${item.description} (${item.id})`);
+            if (item.media.length > 0) {
+              console.log(`✅ ${item.media.length} media found`);
+              console.log("Attempting to get media for first item...");
+              try {
+                await plugin.getItemMedia(item.media[0].id).then((media) => {
+                  console.log(`✅ ${media.length} media found`);
+                });
+              } catch (error) {
+                console.log(
+                  `❌ Media failed for ${categories[0].items[0].id}: ${error}`
+                );
+              }
+            } else {
+              console.log(`❌ No media found`);
             }
-          }
-        });
+          });
       } catch (error) {
         console.log(
           `❌ Category details failed for ${categories[0].items[0].id}: ${error}`
@@ -74,7 +85,9 @@ function testPlugin(plugin: any) {
       }
     });
   } catch (error) {
-    console.log(`❌ Search failed for ${plugin.constructor.name}: ${error}`);
+    console.log(
+      `❌ Home categories failed for ${plugin.constructor.name}: ${error}`
+    );
   }
 }
 

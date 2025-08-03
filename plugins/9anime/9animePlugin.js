@@ -24,8 +24,7 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response); // as CheerioAPI;
+            const $ = cheerio.load(response); // as CheerioAPI;
             var items = [];
             var index = 0;
             $(".flw-item").each(function () {
@@ -69,15 +68,14 @@ class NineAnimePlugin {
             if (!response) {
                 return [];
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = cheerio.load(response);
             var categories = [];
             categories.push({
                 name: "Featured",
                 description: "9anime featured",
                 url: url,
                 isPaginated: false,
-                items: () => {
+                items: (($) => {
                     var items = [];
                     $("#slider > div:nth-child(1) > div.swiper-slide").each(function () {
                         var item = {};
@@ -90,14 +88,9 @@ class NineAnimePlugin {
                             .find("div.desi-description")
                             .text()
                             .trim();
-                        item["imageUrl"] = $(this)
-                            .find("div.deslide-cover-img > img")
-                            .attr("data-src")
-                            .startsWith("/")
-                            ? `${baseUrl}${$(this)
-                                .find("div.deslide-cover-img > img")
-                                .attr("data-src")}`
-                            : $(this).find("div.deslide-cover-img > img").attr("data-src");
+                        item["imageUrl"] = $(this).find("img").attr("src").startsWith("/")
+                            ? `${baseUrl}${$(this).find("img").attr("src")}`
+                            : $(this).find("img").attr("src");
                         item["url"] = $(this)
                             .find("div.desi-head-title > a")
                             .attr("href")
@@ -110,7 +103,7 @@ class NineAnimePlugin {
                         items.push(item);
                     });
                     return items;
-                },
+                })($),
             });
             categories.push({
                 name: $(".block_area-header-tabs > div:nth-child(1) > h2:nth-child(1)")
@@ -121,7 +114,7 @@ class NineAnimePlugin {
                     .trim()}`,
                 url: url,
                 isPaginated: false,
-                items: () => {
+                items: (($) => {
                     var items = [];
                     $(".film_list-wrap > div.flw-item").each(function () {
                         var item = {};
@@ -150,43 +143,46 @@ class NineAnimePlugin {
                         items.push(item);
                     });
                     return items;
-                },
+                })($),
             });
             function parseMultiCategory($) {
                 var categories = [];
                 // var categoryItems = [];
-                $("section.block_area:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div").each(function () {
-                    var category = {};
-                    category["name"] = $(this)
-                        .attr("id")
-                        .split("-")
-                        .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
-                        .join(" ");
-                    category["url"] = url;
-                    category["isPaginated"] = false;
-                    category["items"] = $(this)
-                        .find("ul > li")
-                        .map(function () {
-                        var item = {};
-                        item["id"] = $(this).find("a").attr("href").split("/")[2];
-                        item["name"] = $(this).find("a").text().trim();
-                        item["description"] = $(this)
-                            .find("div.fiml-number > span")
-                            .text()
-                            .trim();
-                        item["imageUrl"] = $(this)
-                            .find("img")
-                            .attr("data-src")
-                            .startsWith("/")
-                            ? `${baseUrl}${$(this).find("img").attr("data-src")}`
-                            : $(this).find("img").attr("data-src");
-                        item["url"] = $(this).find("a").attr("href").startsWith("/")
-                            ? `${baseUrl}${$(this).find("a").attr("href")}`
-                            : $(this).find("a").attr("href");
-                        item["type"] = "Video";
-                        return item;
-                    });
-                    categories.push(category);
+                $("div.tab-content > div").each(function () {
+                    if (!($(this).find("ul > li").length == 0) &&
+                        !($(this).attr("id") == undefined)) {
+                        var category = {};
+                        category["name"] = $(this)
+                            .attr("id")
+                            .split("-")
+                            .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+                            .join(" ");
+                        category["url"] = url;
+                        category["isPaginated"] = false;
+                        category["items"] = $(this)
+                            .find("ul > li")
+                            .map(function () {
+                            var item = {};
+                            item["id"] = $(this).find("a").attr("href").split("/")[2];
+                            item["name"] = $(this).find("a").text().trim();
+                            item["description"] = $(this)
+                                .find("div.fiml-number > span")
+                                .text()
+                                .trim();
+                            item["imageUrl"] = $(this)
+                                .find("img")
+                                .attr("data-src")
+                                .startsWith("/")
+                                ? `${baseUrl}${$(this).find("img").attr("data-src")}`
+                                : $(this).find("img").attr("data-src");
+                            item["url"] = $(this).find("a").attr("href").startsWith("/")
+                                ? `${baseUrl}${$(this).find("a").attr("href")}`
+                                : $(this).find("a").attr("href");
+                            item["type"] = "Video";
+                            return item;
+                        });
+                        categories.push(category);
+                    }
                 });
                 return categories;
             }
@@ -200,9 +196,9 @@ class NineAnimePlugin {
                     .trim()}`,
                 url: url,
                 isPaginated: false,
-                items: () => {
+                items: (($) => {
                     var items = [];
-                    $("ul.ulclear > li").each(function () {
+                    $("section.block_area_sidebar:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li").each(function () {
                         var item = {};
                         item["id"] = $(this)
                             .find("h3.film-name > a")
@@ -226,7 +222,7 @@ class NineAnimePlugin {
                         items.push(item);
                     });
                     return items;
-                },
+                })($),
             });
             return categories;
         });
@@ -241,8 +237,7 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = cheerio.load(response);
             const name = $("h2.film-name").text().trim();
             const imageUrl = $(".anime-poster > div:nth-child(1) > img:nth-child(1)").attr("src");
             const synopsis = $(".shorting").text().trim();
@@ -353,7 +348,7 @@ class NineAnimePlugin {
     getItemMedia(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const baseUrl = this.baseUrl;
-            const serversUrl = `${baseUrl}/ajax/episode/servers?episodeId=${id.split("ep=")[id.split("ep=").length - 1]}`;
+            const serversUrl = `${baseUrl}/ajax/episode/servers?episodeId=${id.split("ep=")[1]}`;
             const serversResponse = yield fetch(serversUrl)
                 .then((response) => response)
                 .then((data) => data.json());
