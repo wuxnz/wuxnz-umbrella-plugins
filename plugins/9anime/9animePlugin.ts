@@ -1,6 +1,6 @@
-import { Cheerio, CheerioAPI } from "cheerio";
+// import { Cheerio, CheerioAPI } from "cheerio";
 
-const cheerio = require("cheerio");
+// const cheerio = require("cheerio");
 
 class NineAnimePlugin {
   baseUrl = "https://9animetv.to";
@@ -14,7 +14,8 @@ class NineAnimePlugin {
     if (!response) {
       return {};
     }
-    const $ = cheerio.load(response); // as CheerioAPI;
+    // @ts-expect-error
+    const $ = Cheerio.load(response); // as CheerioAPI;
     var items = [];
     var index = 0;
     $(".flw-item").each(function () {
@@ -58,7 +59,8 @@ class NineAnimePlugin {
     if (!response) {
       return [];
     }
-    const $ = cheerio.load(response);
+    // @ts-expect-error
+    const $ = Cheerio.load(response);
 
     var categories = [];
 
@@ -141,7 +143,7 @@ class NineAnimePlugin {
       })($),
     });
 
-    function parseMultiCategory($: CheerioAPI) {
+    function parseMultiCategory($: any) {
       var categories = [];
       // var categoryItems = [];
       $("div.tab-content > div").each(function () {
@@ -244,7 +246,8 @@ class NineAnimePlugin {
     if (!response) {
       return {};
     }
-    const $ = cheerio.load(response);
+    // @ts-expect-error
+    const $ = Cheerio.load(response);
     const name = $("h2.film-name").text().trim();
     const imageUrl = $(
       ".anime-poster > div:nth-child(1) > img:nth-child(1)"

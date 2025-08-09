@@ -1,4 +1,5 @@
 "use strict";
+// import { Cheerio, CheerioAPI } from "cheerio";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const cheerio = require("cheerio");
+// const cheerio = require("cheerio");
 class NineAnimePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -24,7 +25,8 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            const $ = cheerio.load(response); // as CheerioAPI;
+            // @ts-expect-error
+            const $ = Cheerio.load(response); // as CheerioAPI;
             var items = [];
             var index = 0;
             $(".flw-item").each(function () {
@@ -68,7 +70,8 @@ class NineAnimePlugin {
             if (!response) {
                 return [];
             }
-            const $ = cheerio.load(response);
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
             var categories = [];
             categories.push({
                 name: "Featured",
@@ -237,7 +240,8 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            const $ = cheerio.load(response);
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
             const name = $("h2.film-name").text().trim();
             const imageUrl = $(".anime-poster > div:nth-child(1) > img:nth-child(1)").attr("src");
             const synopsis = $(".shorting").text().trim();
