@@ -13,6 +13,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+// import { Cheerio, CheerioAPI } from "cheerio";
+// const cheerio = require("cheerio");
 var buffer = require("buffer").Buffer;
 class GogoanimePlugin {
     constructor() {
@@ -36,7 +38,7 @@ class GogoanimePlugin {
                 var items = [];
                 $(".bs").each(function () {
                     var item = {};
-                    item["id"] = $(this).find("a").attr("href").split("/")[2];
+                    item["id"] = $(this).find("a").attr("href").split("/")[$(this).find("a").attr("href").split("/").length - 2];
                     // throw new Error(`${item["id"]}`);
                     item["name"] = $(this).find("div.tt").text().split("<")[0].trim();
                     item["description"] = $(this).find(".typez").text().trim();
@@ -63,78 +65,188 @@ class GogoanimePlugin {
         });
     }
     getCategory(category, page) {
-        return {};
+        return __awaiter(this, void 0, void 0, function* () {
+            return {};
+        });
     }
     getHomeCategories() {
-        return [];
+        return __awaiter(this, void 0, void 0, function* () {
+            const baseUrl = this.baseUrl;
+            const response = yield fetch(`${baseUrl}`)
+                .then((response) => response)
+                .then((data) => data.text());
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
+            var categories = [];
+            $(".bixbox")
+                .filter(function () {
+                return $(this).find("div.listupd") !== undefined;
+            })
+                .map(function () {
+                var category = {};
+                category["name"] = $(this).find("h2").text().trim();
+                category["url"] = baseUrl;
+                category["isPaginated"] = false;
+                category["items"] = (($) => {
+                    var items = [];
+                    $(this)
+                        .find("article.bs a")
+                        .each(function () {
+                        var item = {};
+                        item["id"] = $(this)
+                            .attr("href")
+                            .split("/")[$(this).attr("href").split("/").length - 2].split(/episode-([0-9]+)/)[0];
+                        item["name"] = $(this)
+                            .find("div.tt > h2")
+                            .text()
+                            .split("Episode")[0]
+                            .trim();
+                        item["description"] = $(this).find("div.bt > span").text().trim();
+                        item["imageUrl"] = $(this).find("img").attr("src");
+                        item["url"] = $(this).attr("href").startsWith("/")
+                            ? `${baseUrl}${$(this).find("a").attr("href")}`
+                            : $(this).find("a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                })($);
+                categories.push(category);
+            });
+            $(".series-gen ul.nav-tabs li").each(function () {
+                var category = {};
+                category["name"] = $(this).find("a").text().trim();
+                category["url"] = baseUrl;
+                category["isPaginated"] = false;
+                category["items"] = (($) => {
+                    var items = [];
+                    $(`.series-gen div.listupd > div:nth-child(${$(this).index() + 1})`)
+                        .find("article.bs a")
+                        .each(function () {
+                        var item = {};
+                        item["id"] = $(this)
+                            .attr("href")
+                            .split("/")[$(this).attr("href").split("/").length - 2].split(/episode-([0-9]+)/)[0];
+                        item["name"] = $(this)
+                            .find("div.tt > h2")
+                            .text()
+                            .split("Episode")[0]
+                            .trim();
+                        item["description"] = $(this).find("div.bt > span").text().trim();
+                        item["imageUrl"] = $(this).find("img").attr("src");
+                        item["url"] = $(this).attr("href").startsWith("/")
+                            ? `${baseUrl}${$(this).find("a").attr("href")}`
+                            : $(this).find("a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                })($);
+                categories.push(category);
+            });
+            $("div.section:nth-child(1) ul.ts-wpop-nav-tabs li").each(function () {
+                var category = {};
+                category["name"] = $(this).find("span").text().trim();
+                category["url"] = baseUrl;
+                category["isPaginated"] = false;
+                category["items"] = (($) => {
+                    var items = [];
+                    $(`div.section:nth-child(1) div.serieslist:nth-child(${$(this).index() + 1})`)
+                        .find("ul li")
+                        .each(function () {
+                        var item = {};
+                        item["id"] = $(this).find("h4 > a").attr("href").split("/")[$(this).find("h4 > a").attr("href").split("/").length - 2];
+                        item["name"] = $(this).find("h4 > a").text().trim();
+                        item["description"] = $(this).find("div.ctr").text().trim();
+                        item["imageUrl"] = $(this).find("img").attr("src");
+                        item["url"] = $(this).find("h4 > a").attr("href").startsWith("/")
+                            ? `${baseUrl}${$(this).find("h4 > a").attr("href")}`
+                            : $(this).find("h4 > a").attr("href");
+                        item["type"] = "Video";
+                        items.push(item);
+                    });
+                    return items;
+                })($);
+                categories.push(category);
+            });
+            return categories;
+        });
     }
     getItemDetails(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = `${this.baseUrl}/series/${id}/`;
+            const baseUrl = this.baseUrl;
+            const url = `${this.baseUrl}/anime/${id}/`;
             const response = yield fetch(url)
                 .then((response) => response)
                 .then((data) => data.text());
             if (!response) {
                 return {};
             }
-            const nameRegex = /<h1[\s\S]*?>([\s\S]*?)<\/h1>/;
-            const name = response.match(nameRegex)[1].trim().replace(/&.*?;/g, "");
-            const descriptionRegex = /Type:<\/b>([\s\S]*?)</;
-            const description = response.match(descriptionRegex)[1].trim();
-            const imageUrlRegex = /<div.*class="thumb"[\s\S]*?<img[\s\S]*?src="(.*?)"/;
-            var imageUrl = response.match(imageUrlRegex)[1];
-            const language = name.toLocaleLowerCase().includes("(dub)")
-                ? "English"
-                : "Japanese";
-            const synopsisRegex = /<div.*class="entry-content".*itemprop="description">([\s\S]*?)<\/div/;
-            var synopsis = response
-                .match(synopsisRegex)[1]
-                .trim()
-                .replace(/&.*?;/g, "");
-            const openingTagRegex = /<.*?>/g;
-            synopsis = synopsis.replace(openingTagRegex, "");
-            const closingTagRegex = /<\/.*?>/g;
-            synopsis = synopsis.replace(closingTagRegex, "").trim();
-            const genres = [];
-            const genresElementRegex = /<div.*class="genxed">[\s\S]*?<\/div/;
-            const genresElement = response.match(genresElementRegex) === null
-                ? ""
-                : response.match(genresElementRegex)[0];
-            const genresRegex = /<a[\s\S]*?href="(.*?)"[\s\S]*?>(.*?)<\/a>/g;
-            const genresList = [...genresElement.matchAll(genresRegex)];
-            for (const genre of genresList) {
-                if (genre[1].startsWith("/")) {
-                    genre[1] = `${this.baseUrl}/${genre[1]}`;
-                }
+            // @ts-expect-error
+            const $ = Cheerio.load(response);
+            const name = $("h1.entry-title").text().trim();
+            const description = $(".spe span")
+                .filter(function () {
+                return $(this).find("b").text().includes("Type:");
+            })
+                .first()
+                .text()
+                .replace("Type:", "")
+                .trim();
+            const imageUrl = $(".thumb img").attr("src");
+            const language = "Unknown";
+            var synopsis = "";
+            $(".entry-content p").each(function () {
+                synopsis += $(this).text().trim() + "\n\n";
+            });
+            var genres = [];
+            $(".genxed a").each(function () {
                 genres.push({
-                    id: genre[1].split("/")[genre[1].split("/").length - 2],
-                    name: genre[2],
-                    url: genre[1].startsWith("/") ? this.baseUrl + genre[1] : genre[1],
+                    id: $(this).attr("href").split("/")[2],
+                    name: $(this).text().trim(),
+                    url: $(this).attr("href").startsWith("/")
+                        ? baseUrl + $(this).attr("href")
+                        : $(this).attr("href"),
                 });
-            }
-            const releaseDateRegex = /Released:[\s\S]*?>([\s\S]*?)</;
-            const releaseDate = response.match(releaseDateRegex)[1].trim();
-            const statusRegex = /Status:.*?>(.*?)</;
-            const status = response.match(statusRegex)[1].trim();
-            // const nsfwRegex = /Censor:.*?>(.*?)</;
-            // const nsfw = response.match(nsfwRegex)[1].trim();
-            const episodes = [];
-            // const episodeContainerRegex =
-            //   /<ul>[\s\S]*?\!--themesia.*?>([\s\S]*?)<\!--themesia.*?>[\s\S]*?<\/ul>/;
-            // const episodeContainer = response.match(episodeContainerRegex)[1];
-            const episodesRegex = /<a href="(.*?)">[\s\S]*?num">([\s\S]*?)<[\s\S]*?title">([\s\S]*?)</g;
-            const episodesList = [...response.matchAll(episodesRegex)].slice(1);
-            for (const episode of episodesList) {
+            });
+            const releaseDate = $(".spe span")
+                .filter(function () {
+                return $(this).text().includes("Released:");
+            })
+                .first()
+                .text()
+                .replace("Released:", "")
+                .trim();
+            const creators = $(".spe span")
+                .filter(function () {
+                return $(this).text().includes("Producers:");
+            })
+                .first()
+                .find("a")
+                .map(function () {
+                return $(this).text().trim();
+            })
+                .toArray();
+            const status = $(".spe span")
+                .filter(function () {
+                return $(this).text().includes("Status:");
+            })
+                .first()
+                .text()
+                .replace("Status:", "")
+                .trim();
+            var episodes = [];
+            $(".eplister ul li a").each(function () {
                 episodes.push({
-                    id: episode[1].split("/")[episode[1].split("/").length - 2],
-                    name: episode[3].trim(),
-                    url: episode[1],
-                    language: name.toLocaleLowerCase().includes("(dub)")
-                        ? "English"
-                        : "Sub",
-                    number: parseInt(episode[2].trim()),
+                    id: $(this).attr("href").split("/")[$(this).attr("href").split("/").length - 2],
+                    name: $(this).find(".epl-title").text().trim(),
+                    url: $(this).attr("href").startsWith("/")
+                        ? baseUrl + $(this).attr("href")
+                        : $(this).attr("href"),
+                    language: language,
+                    number: Number($(this).find(".epl-num").text().trim()),
                 });
-            }
+            });
             return {
                 id: id,
                 name: name,
@@ -147,41 +259,19 @@ class GogoanimePlugin {
                 genres: genres,
                 media: episodes,
                 releaseDate: releaseDate,
+                creators: creators,
                 status: status,
-                // nsfw: nsfw,
             };
         });
     }
     getItemMedia(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            // throw new Error(id);
             const episodePageResponse = yield fetch(`${this.baseUrl}/${id}/`)
                 .then((response) => response)
                 .then((data) => data.text());
             if (!episodePageResponse) {
                 return [];
             }
-            // const base64EmbedLinksRegex = /data-hash="(.*?)">(.*?)</g;
-            // const embedLinkRegex = /src="(.*?)"/;
-            // const sources = [
-            //   ...episodePageResponse.matchAll(base64EmbedLinksRegex),
-            // ].map((mat, index) => {
-            //   const url = buffer
-            //     .from(mat[1], "base64")
-            //     .toString("utf-8")
-            //     .match(embedLinkRegex)[1];
-            //   const sourceName =
-            //     mat[2];
-            //   return {
-            //     type: "ExtractorVideo",
-            //     url: url,
-            //     name: sourceName,
-            //     headers: {
-            //       "User-Agent":
-            //         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
-            //     },
-            //   };
-            // });
             var sources = [];
             const rawSourcesRegex = /<option[\s\S]*?value="(.+?)"[\s\S]*?>([\s\S]*?)</g;
             const rawSourcesList = [...episodePageResponse.matchAll(rawSourcesRegex)];

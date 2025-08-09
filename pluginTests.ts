@@ -1,11 +1,10 @@
-// @ts-expect-error
 import * as GogoanimePlugin from "./plugins/gogoanime/GogoanimePlugin";
 // @ts-expect-error
 import * as GogoanimePluginOld from "./plugins/gogoanime-old/GoganimePluginOld";
 
 import * as NineAnimePlugin from "./plugins/9anime/9animePlugin";
 
-const plugins = [NineAnimePlugin];
+const plugins = [GogoanimePlugin];
 
 async function testPlugin(plugin: any) {
   try {
@@ -14,7 +13,9 @@ async function testPlugin(plugin: any) {
         console.log(`✅ ${res.name} - ${res.description}`);
         if (res.items.length > 0) {
           console.log(`✅ ${res.items.length} items found.`);
-          console.log(`Attempting to get details for first item...`);
+          console.log(
+            `Attempting to get details for first item with id ${res.items[0].id}...`
+          );
           try {
             await plugin.getItemDetails(res.items[0].id).then(async (item) => {
               console.log(`✅ ${item.name} - ${item.description}`);
@@ -64,7 +65,9 @@ async function testPlugin(plugin: any) {
             console.log(`✅ ${item.name} - ${item.description} (${item.id})`);
             if (item.media.length > 0) {
               console.log(`✅ ${item.media.length} media found`);
-              console.log("Attempting to get media for first item...");
+              console.log(
+                `Attempting to get media for first item (number ${item.media[0].number})...`
+              );
               try {
                 await plugin.getItemMedia(item.media[0].id).then((media) => {
                   console.log(`✅ ${media.length} media found`);
