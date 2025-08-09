@@ -382,11 +382,11 @@ class NineAnimePlugin {
       .then((response) => response)
       .then((data) => data.json());
     const serversRegex =
-      /<div[\s\S]*?server-item"[\s\S]*?data-type="([\s\S]*?)"[\s\S]*?data-id="([\s\S]*?)[\s\S]*?<a[\s\S]*?class="btn">([\s\S]*?)</g;
+      /<div[\s\S]*?data-type="([\s\S]*?)"[\s\S]*?data-id="([\s\S]*?)"[\s\S]*?btn">([\s\S]*?)</g;
     const servers = [...serversResponse.html.matchAll(serversRegex)].map(
       function (item) {
         return {
-          language: item[1].trim(),
+          language: item[1][0].trim().toUpperCase() + item[1].trim().slice(1),
           id: item[2].trim(),
           name: item[3].trim(),
         };
