@@ -5,9 +5,9 @@
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
 
-// import { Cheerio, CheerioAPI } from "cheerio";
+import { Cheerio, CheerioAPI } from "cheerio";
 
-// const cheerio = require("cheerio");
+const cheerio = require("cheerio");
 
 var buffer = require("buffer").Buffer;
 class GogoanimePlugin {
@@ -68,7 +68,7 @@ class GogoanimePlugin {
       .then((data) => data.text());
 
     // @ts-expect-error
-    const $ = Cheerio.load(response);
+    const $: CheerioAPI = Cheerio.load(response);
 
     var categories = [];
 
@@ -80,10 +80,12 @@ class GogoanimePlugin {
       })
       .map(function () {
         var category = {};
-        category["name"] =
-          $(this).find("div.releases > h2").first() === undefined
-            ? $(this).find("div.releases > h3").first().text().trim()
-            : $(this).find("div.releases > h2").first().text().trim();
+        category["name"] = $(this)
+          .find("div.releases")
+          .children()
+          .first()
+          .text()
+          .trim();
         category["url"] = baseUrl;
         category["isPaginated"] = false;
         category["items"] = (($) => {

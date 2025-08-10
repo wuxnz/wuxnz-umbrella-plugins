@@ -1,3 +1,4 @@
+"use strict";
 // Include ts-nocheck here if using modules that arent builtin to node
 // Also delete any imports from this file. Use require() instead
 //This is an example plugin. Do not use in production.
@@ -13,8 +14,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// import { Cheerio, CheerioAPI } from "cheerio";
-// const cheerio = require("cheerio");
+Object.defineProperty(exports, "__esModule", { value: true });
+const cheerio = require("cheerio");
 var buffer = require("buffer").Buffer;
 class GogoanimePlugin {
     constructor() {
@@ -85,10 +86,12 @@ class GogoanimePlugin {
             })
                 .map(function () {
                 var category = {};
-                category["name"] =
-                    $(this).find("div.releases > h2").first() === undefined
-                        ? $(this).find("div.releases > h3").first().text().trim()
-                        : $(this).find("div.releases > h2").first().text().trim();
+                category["name"] = $(this)
+                    .find("div.releases")
+                    .children()
+                    .first()
+                    .text()
+                    .trim();
                 category["url"] = baseUrl;
                 category["isPaginated"] = false;
                 category["items"] = (($) => {
@@ -296,9 +299,9 @@ class GogoanimePlugin {
     }
 }
 module.exports = {
-    search: (query, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePlugin().search(query, page); }),
-    getCategory: (category, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePlugin().getCategory(category, page); }),
-    getHomeCategories: () => __awaiter(this, void 0, void 0, function* () { return new GogoanimePlugin().getHomeCategories(); }),
-    getItemDetails: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePlugin().getItemDetails(id); }),
-    getItemMedia: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePlugin().getItemMedia(id); }),
+    search: (query, page) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().search(query, page); }),
+    getCategory: (category, page) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getCategory(category, page); }),
+    getHomeCategories: () => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getHomeCategories(); }),
+    getItemDetails: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getItemDetails(id); }),
+    getItemMedia: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getItemMedia(id); }),
 };
