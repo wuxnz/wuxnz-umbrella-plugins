@@ -84,7 +84,7 @@ class GogoanimePlugin {
             })
                 .map(function () {
                 var category = {};
-                category["name"] = $(this).find("h2").text().trim();
+                category["name"] = $(this).find("h2").first().text().trim();
                 category["url"] = baseUrl;
                 category["isPaginated"] = false;
                 category["items"] = (($) => {
