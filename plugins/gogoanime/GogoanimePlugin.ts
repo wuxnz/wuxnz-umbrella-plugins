@@ -72,13 +72,18 @@ class GogoanimePlugin {
 
     var categories = [];
 
+    var index = 0;
+
     $(".bixbox")
       .filter(function () {
         return $(this).find("div.listupd") !== undefined;
       })
       .map(function () {
         var category = {};
-        category["name"] = $(this).find("h2").first().text().trim();
+        category["name"] =
+          $(this).find("div.releases > h2").first() === undefined
+            ? $(this).find("h3").first().text().trim()
+            : $(this).find("div.releases > h2").first().text().trim();
         category["url"] = baseUrl;
         category["isPaginated"] = false;
         category["items"] = (($) => {
