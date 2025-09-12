@@ -8,13 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+// @ts-nocheck
 const cheerio_1 = require("cheerio");
-const SourceType_1 = __importDefault(require("../../models/source/SourceType"));
-const MediaType_1 = __importDefault(require("../../models/media/MediaType"));
+// import {
+//   SourceType,
+//   MediaType,
+//   Category,
+//   DetailedItem,
+//   ExtractorAudio,
+//   ExtractorVideo,
+//   RawAudio,
+//   RawVideo,
+//   ItemMedia,
+//   Item,
+//   ContentService,
+//   Genre
+// } from '../../models';
 class NineAnimePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -43,7 +53,7 @@ class NineAnimePlugin {
                 item["url"] = $(this).find("a").attr("href").startsWith("/")
                     ? `${baseUrl}${$(this).find("a").attr("href")}`
                     : $(this).find("a").attr("href");
-                item["type"] = SourceType_1.default.Video;
+                item["type"] = SourceType.Video;
                 items.push(item);
                 index++;
             });
@@ -104,7 +114,7 @@ class NineAnimePlugin {
                                 .find("div.desi-head-title > a")
                                 .attr("href")}`
                             : $(this).find("div.desi-head-title > a").attr("href");
-                        item["type"] = SourceType_1.default.Video;
+                        item["type"] = SourceType.Video;
                         items.push(item);
                     });
                     return items;
@@ -183,7 +193,7 @@ class NineAnimePlugin {
                             item["url"] = $(this).find("a").attr("href").startsWith("/")
                                 ? `${baseUrl}${$(this).find("a").attr("href")}`
                                 : $(this).find("a").attr("href");
-                            item["type"] = SourceType_1.default.Video;
+                            item["type"] = SourceType.Video;
                             return item;
                         });
                         categories.push(category);
@@ -223,7 +233,7 @@ class NineAnimePlugin {
                             .startsWith("/")
                             ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
                             : $(this).find("h3.film-name > a").attr("href");
-                        item["type"] = SourceType_1.default.Video;
+                        item["type"] = SourceType.Video;
                         items.push(item);
                     });
                     return items;
@@ -256,7 +266,7 @@ class NineAnimePlugin {
                 item["url"] = $(this).find("a").attr("href").startsWith("/")
                     ? `${baseUrl}${$(this).find("a").attr("href")}`
                     : $(this).find("a").attr("href");
-                item["type"] = SourceType_1.default.Video;
+                item["type"] = SourceType.Video;
                 related.push(item);
             });
             const metaInfos = $(".col1 > div");
@@ -324,10 +334,12 @@ class NineAnimePlugin {
                     episodes.push({
                         id: item[1].split("/")[2],
                         name: item[2].trim(),
+                        description: "",
                         url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
                         language: "Unknown",
                         number: Number(item[3].trim()),
-                        type: MediaType_1.default.ExtractorVideo,
+                        type: MediaType.ExtractorVideo,
+                        sources: [],
                     });
                 });
             }
@@ -337,8 +349,10 @@ class NineAnimePlugin {
                 description: description,
                 imageUrl: imageUrl,
                 url: url,
-                type: SourceType_1.default.Video,
+                type: SourceType.Video,
+                source: undefined,
                 language: "Unknown",
+                trailerUrl: "",
                 synopsis: synopsis,
                 related: related,
                 genres: genres,
@@ -376,7 +390,7 @@ class NineAnimePlugin {
                 if (serverResponse.link != null &&
                     serverResponse.link != undefined &&
                     serverResponse.link != "") {
-                    source["type"] = MediaType_1.default.ExtractorVideo;
+                    source["type"] = MediaType.ExtractorVideo;
                     source["url"] = serverResponse.link;
                     source["name"] = server.name + " - " + server.language;
                     sources.push(source);
