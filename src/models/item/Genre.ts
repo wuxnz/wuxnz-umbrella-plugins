@@ -1,16 +1,10 @@
-import {Plugin} from '../Plugin';
-import Item from './Item';
+import { Item } from './Item';
 
-interface Genre {
-  id: string;
+export interface Genre {
   name: string;
-  description?: string | undefined;
+  description: string | undefined;
   url: string;
-  isPaginated?: boolean;
-  nextPageNumber?: number;
-  previousPageNumber?: number;
-  items?: Item[];
-  source?: Plugin;
+  isPaginated: boolean;
+  getNextPage?: (page: number) => Promise<Item[]>;
+  items: Item[];
 }
-
-export default Genre;

@@ -1,8 +1,13 @@
-import MediaType from '../media/MediaType';
+import { MediaType } from '../media/MediaType';
 
-interface ItemMedia {
+import { ExtractorAudio } from '../media/ExtractorAudio';
+import { ExtractorVideo } from '../media/ExtractorVideo';
+import { RawAudio } from '../media/RawAudio';
+import { RawVideo } from '../media/RawVideo';
+
+export interface ItemMedia {
   id: string;
-  name?: string;
+  name: string;
   description?: string;
   imageUrl?: string;
   releaseDate?: string;
@@ -11,8 +16,10 @@ interface ItemMedia {
   filler?: boolean;
   type: MediaType;
   url: string;
-  language?: string;
-  number: number;
+  width?: number;
+  height?: number;
+  size?: number;
+  fileType?: string;
+  headers?: Record<string, string>;
+  sources: (ExtractorVideo | RawVideo | ExtractorAudio | RawAudio)[];
 }
-
-export default ItemMedia;

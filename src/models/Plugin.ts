@@ -1,5 +1,5 @@
 // import ContentService from './ContentService';
-import SourceType from './source/SourceType';
+import { SourceType } from './source/SourceType';
 
 // Plugin
 // This is the interface for a plugin
@@ -18,11 +18,10 @@ export interface Plugin {
   manifestUrl?: string; // Optional URL to the manifest file
   pluginPath?: string; // Optional path to the plugin file
   pluginUrl: string; // Optional URL to the plugin file
-  bannerImageUrl?: string; // Optional URL to a banner image for the plugin
-  changelog?: string; // Optional changelog for the plugin
-  readme?: string; // Optional readme for the plugin
-  license?: string; // Optional license for the plugin
-  // banner?: React.ComponentType; // Optional banner to show in plugin page
+  bannerImageUrl?: string; // Optional banner to show in plugin page
+  changelog?: string;
+  readme?: string;
+  licese?: string;
   // contentServiceSource?: string; // Content service provided by the plugin to get content
   // contentService?: ContentService;
 }

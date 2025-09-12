@@ -1,16 +1,31 @@
 import { type CheerioAPI, load } from 'cheerio';
-import SourceType from '../../models/source/SourceType';
-import MediaType from '../../models/media/MediaType';
-import Category from '../../models/item/Category';
-import DetailedItem from '../../models/item/DetailedItem';
-import ExtractorAudio from '../../models/media/ExtractorAudio';
-import ExtractorVideo from '../../models/media/ExtractorVideo';
-import RawAudio from '../../models/media/RawAudio';
-import RawVideo from '../../models/media/RawVideo';
-import ItemMedia from '../../models/item/ItemMedia';
-import Item from '../../models/item/Item';
-import ContentService from '../../models/ContentService';
-import Genre from '../../models/item/Genre';
+// import SourceType from '../../models/source/SourceType';
+// import MediaType from '../../models/media/MediaType';
+// import Category from '../../models/item/Category';
+// import DetailedItem from '../../models/item/DetailedItem';
+// import ExtractorAudio from '../../models/media/ExtractorAudio';
+// import ExtractorVideo from '../../models/media/ExtractorVideo';
+// import RawAudio from '../../models/media/RawAudio';
+// import RawVideo from '../../models/media/RawVideo';
+// import ItemMedia from '../../models/item/ItemMedia';
+// import Item from '../../models/item/Item';
+// import ContentService from '../../models/ContentService';
+// import Genre from '../../models/item/Genre';
+
+import {
+  SourceType,
+  MediaType,
+  Category,
+  DetailedItem,
+  ExtractorAudio,
+  ExtractorVideo,
+  RawAudio,
+  RawVideo,
+  ItemMedia,
+  Item,
+  ContentService,
+  Genre
+} from '../../models';
 
 class NineAnimePlugin implements ContentService {
   baseUrl = "https://9animetv.to";
@@ -356,10 +371,12 @@ class NineAnimePlugin implements ContentService {
         episodes.push({
           id: item[1].split("/")[2],
           name: item[2].trim(),
+          description: "",
           url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
           language: "Unknown",
           number: Number(item[3].trim()),
           type: MediaType.ExtractorVideo,
+          sources: [],
         } as ItemMedia);
       });
     }
@@ -371,7 +388,9 @@ class NineAnimePlugin implements ContentService {
       imageUrl: imageUrl,
       url: url,
       type: SourceType.Video,
+      source: undefined,
       language: "Unknown",
+      trailerUrl: "",
       synopsis: synopsis,
       related: related,
       genres: genres,
