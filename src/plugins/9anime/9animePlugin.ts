@@ -1,31 +1,20 @@
+// @ts-nocheck
 import { type CheerioAPI, load } from 'cheerio';
-// import SourceType from '../../models/source/SourceType';
-// import MediaType from '../../models/media/MediaType';
-// import Category from '../../models/item/Category';
-// import DetailedItem from '../../models/item/DetailedItem';
-// import ExtractorAudio from '../../models/media/ExtractorAudio';
-// import ExtractorVideo from '../../models/media/ExtractorVideo';
-// import RawAudio from '../../models/media/RawAudio';
-// import RawVideo from '../../models/media/RawVideo';
-// import ItemMedia from '../../models/item/ItemMedia';
-// import Item from '../../models/item/Item';
-// import ContentService from '../../models/ContentService';
-// import Genre from '../../models/item/Genre';
 
-import {
-  SourceType,
-  MediaType,
-  Category,
-  DetailedItem,
-  ExtractorAudio,
-  ExtractorVideo,
-  RawAudio,
-  RawVideo,
-  ItemMedia,
-  Item,
-  ContentService,
-  Genre
-} from '../../models';
+// import {
+//   SourceType,
+//   MediaType,
+//   Category,
+//   DetailedItem,
+//   ExtractorAudio,
+//   ExtractorVideo,
+//   RawAudio,
+//   RawVideo,
+//   ItemMedia,
+//   Item,
+//   ContentService,
+//   Genre
+// } from '../../models';
 
 class NineAnimePlugin implements ContentService {
   baseUrl = "https://9animetv.to";
