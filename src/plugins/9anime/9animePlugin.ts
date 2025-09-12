@@ -1,38 +1,23 @@
-// @ts-nocheck
 import { type CheerioAPI, load } from 'cheerio';
 
-// import {
-//   SourceType,
-//   MediaType,
-//   Category,
-//   DetailedItem,
-//   ExtractorAudio,
-//   ExtractorVideo,
-//   RawAudio,
-//   RawVideo,
-//   ItemMedia,
-//   Item,
-//   ContentService,
-//   Genre
-// } from '../../models';
 
-class NineAnimePlugin implements ContentService {
+class NineAnimePlugin {
   baseUrl = "https://9animetv.to";
 
-  async search(query: string, page?: number): Promise<Category> {
+  async search(query: string, page?: number): Promise<object> {
     var baseUrl = this.baseUrl;
     const url = `${baseUrl}/search?keyword=${query}&page=${page || 1}`;
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
-      return {} as Category;
+      return {};
     }
     const $ = load(response);
-    var items: Item[] = [];
+    var items = [];
     var index = 0;
     $(".flw-item").each(function () {
-      var item: Partial<Item> = {};
+      var item = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
       item["name"] = $(this).find(".dynamic-name").text().trim();
       item["description"] = $(
@@ -45,7 +30,7 @@ class NineAnimePlugin implements ContentService {
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
       item["type"] = "Video";
-      items.push(item as Item);
+      items.push(item);
       index++;
     });
     return {
@@ -56,25 +41,25 @@ class NineAnimePlugin implements ContentService {
       nextPageNumber: page + 1,
       previousPageNumber: page > 1 ? page - 1 : undefined,
       items: items,
-    } as Category;
+    };
   }
 
-  async getCategory(category: string, page?: number): Promise<Category> {
-    return {} as Category;
+  async getCategory(category: string, page?: number): Promise<object> {
+    return {};
   }
 
-  async getHomeCategories(): Promise<Category[]> {
+  async getHomeCategories(): Promise<object[]> {
     const baseUrl = this.baseUrl;
     const url = `${baseUrl}/home`;
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
-      return [] as Category[];
+      return [];
     }
     const $ = load(response);
 
-    var categories: Category[] = [];
+    var categories: object[] = [];
 
     categories.push({
       name: "Featured",
@@ -82,9 +67,9 @@ class NineAnimePlugin implements ContentService {
       url: url,
       isPaginated: false,
       items: (($: any) => {
-        var items: Item[] = [];
+        var items = [];
         $("#slider > div:nth-child(1) > div.swiper-slide").each(function () {
-          var item: Partial<Item> = {};
+          var item = {};
           item["id"] = $(this)
             .find("div.desi-head-title > a")
             .attr("href")
@@ -105,8 +90,8 @@ class NineAnimePlugin implements ContentService {
                 .find("div.desi-head-title > a")
                 .attr("href")}`
             : $(this).find("div.desi-head-title > a").attr("href");
-          item["type"] = SourceType.Video;
-          items.push(item as Item);
+          item["type"] = "Video";
+          items.push(item);
         });
         return items;
       })($),
@@ -151,19 +136,19 @@ class NineAnimePlugin implements ContentService {
           item["type"] = "Video";
           items.push(item);
         });
-        return items as Item[];
+        return items;
       })($),
-    } as Category);
+    });
 
     function parseMultiCategory($: any) {
-      var categories: Category[] = [];
+      var categories: object[] = [];
       // var categoryItems = [];
       $("div.tab-content > div").each(function () {
         if (
           !($(this).find("ul > li").length == 0) &&
           !($(this).attr("id") == undefined)
         ) {
-          var category: Partial<Category> = {};
+          var category = {};
           category["name"] = $(this)
             .attr("id")
             .split("-")
@@ -174,7 +159,7 @@ class NineAnimePlugin implements ContentService {
           category["items"] = $(this)
             .find("ul > li")
             .map(function () {
-              var item: Partial<Item> = {};
+              var item = {};
               item["id"] = $(this).find("a").attr("href").split("/")[2];
               item["name"] = $(this).find("a").text().trim();
               item["description"] = $(this)
@@ -190,13 +175,13 @@ class NineAnimePlugin implements ContentService {
               item["url"] = $(this).find("a").attr("href").startsWith("/")
                 ? `${baseUrl}${$(this).find("a").attr("href")}`
                 : $(this).find("a").attr("href");
-              item["type"] = SourceType.Video;
+              item["type"] = "Video";
               return item;
             });
-          categories.push(category as Category);
+          categories.push(category);
         }
       });
-      return categories as Category[];
+      return categories;
     }
 
     categories.push(...parseMultiCategory($));
@@ -215,11 +200,11 @@ class NineAnimePlugin implements ContentService {
       url: url,
       isPaginated: false,
       items: (($: any) => {
-        var items: Item[] = [];
+        var items = [];
         $(
           "section.block_area_sidebar:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li"
         ).each(function () {
-          var item: Partial<Item> = {};
+          var item = {};
           item["id"] = $(this)
             .find("h3.film-name > a")
             .attr("href")
@@ -238,17 +223,17 @@ class NineAnimePlugin implements ContentService {
             .startsWith("/")
             ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
             : $(this).find("h3.film-name > a").attr("href");
-          item["type"] = SourceType.Video;
-          items.push(item as Item);
+          item["type"] = "Video";
+          items.push(item);
         });
-        return items as Item[];
+        return items;
       })($),
-    } as Category);
+    });
 
     return categories;
   }
 
-  async getItemDetails(id: string): Promise<DetailedItem> {
+  async getItemDetails(id: string): Promise<object> {
     const baseUrl = this.baseUrl;
     const url = `${baseUrl}/watch/${id}`;
     const response = await fetch(url)
@@ -256,7 +241,7 @@ class NineAnimePlugin implements ContentService {
       .then((data) => data.text());
 
     if (!response) {
-      return {} as DetailedItem;
+      return {};
     }
     const $ = load(response);
     const name = $("h2.film-name").text().trim();
@@ -264,11 +249,11 @@ class NineAnimePlugin implements ContentService {
       ".anime-poster > div:nth-child(1) > img:nth-child(1)"
     ).attr("src");
     const synopsis = $(".shorting").text().trim();
-    var related: Item[] = [];
+    var related = [];
     $(
       ".cbox-collapse > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li"
     ).each(function () {
-      var item: Partial<Item> = {};
+      var item = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
       item["name"] = $(this).find("a").text().trim();
       item["description"] = $(this).find("span").text().trim();
@@ -276,8 +261,8 @@ class NineAnimePlugin implements ContentService {
       item["url"] = $(this).find("a").attr("href").startsWith("/")
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
-      item["type"] = SourceType.Video;
-      related.push(item as Item);
+      item["type"] = "Video";
+      related.push(item);
     });
     const metaInfos = $(".col1 > div");
     const description = metaInfos
@@ -289,7 +274,7 @@ class NineAnimePlugin implements ContentService {
       .find(".item-content")
       .text()
       .trim();
-    var genres: Genre[] = [];
+    var genres: object[] = [];
     var genresElement = metaInfos.filter(function () {
       return (
         $(this).find(".item-title").text().trim().toLowerCase() == "genre:"
@@ -297,7 +282,7 @@ class NineAnimePlugin implements ContentService {
     });
     if (genresElement.length > 0) {
       genresElement.find(".item-content > a").each(function () {
-        var genre: Partial<Genre> = {};
+        var genre = {};
         genre["id"] = $(this).attr("href").split("/")[2];
         genre["name"] = $(this).text().trim();
         genre["url"] = $(this).attr("href").startsWith("/")
@@ -306,7 +291,7 @@ class NineAnimePlugin implements ContentService {
         genre["isPaginated"] = true;
         genre["nextPageNumber"] = 1;
         genre["previousPageNumber"] = undefined;
-        genres.push(genre as Genre);
+        genres.push(genre);
       });
     }
     var releaseDate;
@@ -347,7 +332,7 @@ class NineAnimePlugin implements ContentService {
     }
     var otherNames = $(".alias").text().trim().split(", ");
 
-    var episodes: ItemMedia[] = [];
+    var episodes: object[] = [];
     const episodeResponse = await fetch(
       `${baseUrl}/ajax/episode/list/${id.split("-")[id.split("-").length - 1]}`
     )
@@ -364,9 +349,9 @@ class NineAnimePlugin implements ContentService {
           url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
           language: "Unknown",
           number: Number(item[3].trim()),
-          type: MediaType.ExtractorVideo,
+          type: "ExtractorVideo",
           sources: [],
-        } as ItemMedia);
+        });
       });
     }
 
@@ -376,7 +361,7 @@ class NineAnimePlugin implements ContentService {
       description: description,
       imageUrl: imageUrl,
       url: url,
-      type: SourceType.Video,
+      type: "Video",
       source: undefined,
       language: "Unknown",
       trailerUrl: "",
@@ -389,10 +374,10 @@ class NineAnimePlugin implements ContentService {
       creators: creators,
       status: status,
       otherNames: otherNames,
-    } as DetailedItem;
+    };
   }
 
-  async getItemMedia(id: string): Promise<(ExtractorAudio | ExtractorVideo | RawAudio | RawVideo)[]> {
+  async getItemMedia(id: string): Promise<object[]> {
     const baseUrl = this.baseUrl;
     const serversUrl = `${baseUrl}/ajax/episode/servers?episodeId=${
       id.split("ep=")[1]
@@ -411,7 +396,7 @@ class NineAnimePlugin implements ContentService {
         };
       }
     );
-    var sources: (ExtractorVideo | ExtractorAudio | RawAudio | RawVideo)[] = [];
+    var sources: object[] = [];
     for (const server of servers) {
       var source = {};
       const serverUrl = `${baseUrl}/ajax/episode/sources?id=${server.id}`;
@@ -423,10 +408,10 @@ class NineAnimePlugin implements ContentService {
         serverResponse.link != undefined &&
         serverResponse.link != ""
       ) {
-        source["type"] = MediaType.ExtractorVideo;
+        source["type"] = "ExtractorVideo";
         source["url"] = serverResponse.link;
         source["name"] = server.name + " - " + server.language;
-        sources.push(source as ExtractorVideo);
+        sources.push(source);
       }
     }
     return sources;
