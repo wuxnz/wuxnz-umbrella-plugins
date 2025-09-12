@@ -44,7 +44,7 @@ class NineAnimePlugin implements ContentService {
       item["url"] = $(this).find("a").attr("href").startsWith("/")
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
-      item["type"] = SourceType.Video;
+      item["type"] = "Video";
       items.push(item as Item);
       index++;
     });
