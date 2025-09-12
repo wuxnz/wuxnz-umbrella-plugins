@@ -1,10 +1,4 @@
 "use strict";
-// Include ts-nocheck here if using modules that arent builtin to node
-// Also delete any imports from this file. Use require() instead
-//This is an example plugin. Do not use in production.
-// Functions' return types are placeholders
-// Actual types are in models/ folder
-// Refer to models/ContentService.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,8 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const cheerio = require("cheerio");
-var buffer = require("buffer").Buffer;
+const cheerio_1 = require("cheerio");
 class GogoanimePlugin {
     constructor() {
         this.baseUrl = "https://gogoanimez.to";
@@ -25,17 +18,17 @@ class GogoanimePlugin {
     }
     search(query, page) {
         return __awaiter(this, void 0, void 0, function* () {
+            const baseUrl = this.baseUrl;
             try {
                 const pageNum = page || 1;
-                const url = `${this.baseUrl}/page/${pageNum}/?s=${query}`;
+                const url = `${baseUrl}/page/${pageNum}/?s=${query}`;
                 const response = yield fetch(url)
                     .then((response) => response)
                     .then((data) => data.text());
                 if (!response) {
                     return {};
                 }
-                // @ts-expect-error
-                const $ = Cheerio.load(response);
+                const $ = (0, cheerio_1.load)(response);
                 var items = [];
                 $(".bs").each(function () {
                     var item = {};
@@ -45,7 +38,7 @@ class GogoanimePlugin {
                     item["description"] = $(this).find(".typez").text().trim();
                     item["imageUrl"] = $(this).find("img").attr("src");
                     item["url"] = $(this).find("a").attr("href").startsWith("/")
-                        ? `${this.baseUrl}${$(this).find("a").attr("href")}`
+                        ? `${baseUrl}${$(this).find("a").attr("href")}`
                         : $(this).find("a").attr("href");
                     item["type"] = "Video";
                     items.push(item);
@@ -76,8 +69,7 @@ class GogoanimePlugin {
             const response = yield fetch(`${baseUrl}`)
                 .then((response) => response)
                 .then((data) => data.text());
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = (0, cheerio_1.load)(response);
             var categories = [];
             var index = 0;
             $(".bixbox")
@@ -189,8 +181,7 @@ class GogoanimePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = (0, cheerio_1.load)(response);
             const name = $("h1.entry-title").text().trim();
             const description = $(".spe span")
                 .filter(function () {
@@ -305,3 +296,4 @@ module.exports = {
     getItemDetails: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getItemDetails(id); }),
     getItemMedia: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePlugin().getItemMedia(id); }),
 };
+exports.default = GogoanimePlugin;

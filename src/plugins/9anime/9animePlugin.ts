@@ -1,6 +1,5 @@
 import { type CheerioAPI, load } from 'cheerio';
 
-
 class NineAnimePlugin {
   baseUrl = "https://9animetv.to";
 
@@ -13,7 +12,7 @@ class NineAnimePlugin {
     if (!response) {
       return {};
     }
-    const $ = load(response);
+    const $: CheerioAPI = load(response);
     var items = [];
     var index = 0;
     $(".flw-item").each(function () {
@@ -57,7 +56,7 @@ class NineAnimePlugin {
     if (!response) {
       return [];
     }
-    const $ = load(response);
+    const $: CheerioAPI = load(response);
 
     var categories: object[] = [];
 
@@ -243,7 +242,7 @@ class NineAnimePlugin {
     if (!response) {
       return {};
     }
-    const $ = load(response);
+    const $: CheerioAPI = load(response);
     const name = $("h2.film-name").text().trim();
     const imageUrl = $(
       ".anime-poster > div:nth-child(1) > img:nth-child(1)"

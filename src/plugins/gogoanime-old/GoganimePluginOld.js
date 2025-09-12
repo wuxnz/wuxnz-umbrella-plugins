@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,12 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// Include ts-nocheck here if using modules that arent builtin to node
-// Also delete any imports from this file. Use require() instead
-//This is an example plugin. Do not use in production.
-// Functions' return types are placeholders
-// Actual types are in models/ folder
-// Refer to models/ContentService.ts
+Object.defineProperty(exports, "__esModule", { value: true });
+const cheerio_1 = require("cheerio");
 class GogoanimePluginOld {
     constructor() {
         this.baseUrl = "https://gogoanimes.fi";
@@ -31,42 +28,11 @@ class GogoanimePluginOld {
                 if (!response) {
                     return {};
                 }
-                // const ulRegex = /<ul.*class="items".*>([\s\S]*?)<\/ul>/;
-                // const listUl = response.match(ulRegex)[1];
-                // const listItemsRegex = /<li>([\s\S]*?)<\/li>/g;
-                // const listItems = [...listUl.matchAll(listItemsRegex)].map(
-                //   (item) => item[1]
-                // );
-                // const items = [];
-                // const idRegex = /<a[\s\S]*?href="\/category\/(.*?)"[\s\S]*?title=".*?">/;
-                // const nameRegex =
-                //   /<a[\s\S]*?href="\/category\/.*?"[\s\S]*?title="(.*?)">/;
-                // const descriptionRegex = /:(.*?)<\/p>/;
-                // const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
-                // for (const item of listItems) {
-                //   const id = item.match(idRegex)[1];
-                //   const name = item.match(nameRegex)[1];
-                //   const description = item.match(descriptionRegex)[1].trim();
-                //   var imageUrl = item.match(imageUrlRegex)[1];
-                //   if (imageUrl.startsWith("/")) {
-                //     imageUrl = `${this.baseUrl}/${imageUrl}`;
-                //   }
-                //   items.push({
-                //     id,
-                //     name,
-                //     description,
-                //     imageUrl,
-                //     url: url,
-                //     type: this.sourceType,
-                //   });
-                // }
                 const items = [];
-                // @ts-expect-error
-                const $ = Cheerio.load(response);
+                const $ = (0, cheerio_1.load)(response);
                 $(".items li").each(function () {
                     var item = {};
                     item["id"] = $(this).find("a").attr("href").split("/")[2];
-                    // throw new Error(`${item["id"]}`);
                     item["name"] = $(this).find(".name a").text().trim();
                     item["description"] = $(`this`).find(".released").text().trim();
                     item["imageUrl"] = $(this).find("img").attr("src").startsWith("/")
@@ -106,7 +72,6 @@ class GogoanimePluginOld {
     getItemDetails(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = `${this.baseUrl}/category/${id}`;
-            // throw new Error(url);
             const response = yield fetch(url)
                 .then((response) => response)
                 .then((data) => data.text());
@@ -210,9 +175,10 @@ class GogoanimePluginOld {
     }
 }
 module.exports = {
-    search: (query, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().search(query, page); }),
-    getCategory: (category, page) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getCategory(category, page); }),
-    getHomeCategories: () => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getHomeCategories(); }),
-    getItemDetails: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
-    getItemMedia: (id) => __awaiter(this, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
+    search: (query, page) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePluginOld().search(query, page); }),
+    getCategory: (category, page) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePluginOld().getCategory(category, page); }),
+    getHomeCategories: () => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePluginOld().getHomeCategories(); }),
+    getItemDetails: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
+    getItemMedia: (id) => __awaiter(void 0, void 0, void 0, function* () { return new GogoanimePluginOld().getItemDetails(id); }),
 };
+exports.default = GogoanimePluginOld;

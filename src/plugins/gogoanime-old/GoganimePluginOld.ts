@@ -1,15 +1,11 @@
-// Include ts-nocheck here if using modules that arent builtin to node
-// Also delete any imports from this file. Use require() instead
-//This is an example plugin. Do not use in production.
-// Functions' return types are placeholders
-// Actual types are in models/ folder
-// Refer to models/ContentService.ts
+import { type CheerioAPI, load } from 'cheerio';
+
 class GogoanimePluginOld {
   baseUrl = "https://gogoanimes.fi";
   // baseUrl = "https://gogoanime.ink";
   //   ajaxUrl = "https://ajax.gogocdn.net";
   sourceType = "Video";
-  async search(query, page) {
+  async search(query: string, page?: number): Promise<object> {
     try {
       var baseUrl = this.baseUrl;
       const url = `${baseUrl}/search?keyword=${query}&page=${page || 1}`;
@@ -19,42 +15,11 @@ class GogoanimePluginOld {
       if (!response) {
         return {};
       }
-      // const ulRegex = /<ul.*class="items".*>([\s\S]*?)<\/ul>/;
-      // const listUl = response.match(ulRegex)[1];
-      // const listItemsRegex = /<li>([\s\S]*?)<\/li>/g;
-      // const listItems = [...listUl.matchAll(listItemsRegex)].map(
-      //   (item) => item[1]
-      // );
-      // const items = [];
-      // const idRegex = /<a[\s\S]*?href="\/category\/(.*?)"[\s\S]*?title=".*?">/;
-      // const nameRegex =
-      //   /<a[\s\S]*?href="\/category\/.*?"[\s\S]*?title="(.*?)">/;
-      // const descriptionRegex = /:(.*?)<\/p>/;
-      // const imageUrlRegex = /<img[\s\S]*?src="(.*?)"/;
-      // for (const item of listItems) {
-      //   const id = item.match(idRegex)[1];
-      //   const name = item.match(nameRegex)[1];
-      //   const description = item.match(descriptionRegex)[1].trim();
-      //   var imageUrl = item.match(imageUrlRegex)[1];
-      //   if (imageUrl.startsWith("/")) {
-      //     imageUrl = `${this.baseUrl}/${imageUrl}`;
-      //   }
-      //   items.push({
-      //     id,
-      //     name,
-      //     description,
-      //     imageUrl,
-      //     url: url,
-      //     type: this.sourceType,
-      //   });
-      // }
       const items = [];
-      // @ts-expect-error
-      const $ = Cheerio.load(response);
+      const $: CheerioAPI = load(response);
       $(".items li").each(function () {
         var item = {};
         item["id"] = $(this).find("a").attr("href").split("/")[2];
-        // throw new Error(`${item["id"]}`);
         item["name"] = $(this).find(".name a").text().trim();
         item["description"] = $(`this`).find(".released").text().trim();
         item["imageUrl"] = $(this).find("img").attr("src").startsWith("/")
@@ -81,15 +46,14 @@ class GogoanimePluginOld {
       throw err;
     }
   }
-  async getCategory(category, page) {
+  async getCategory(category: string, page?: number): Promise<object> {
     return {};
   }
-  async getHomeCategories() {
+  async getHomeCategories(): Promise<object[]> {
     return [];
   }
-  async getItemDetails(id) {
+  async getItemDetails(id: string): Promise<object> {
     const url = `${this.baseUrl}/category/${id}`;
-    // throw new Error(url);
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
@@ -205,3 +169,5 @@ module.exports = {
   getItemMedia: async (id: string) =>
     new GogoanimePluginOld().getItemDetails(id),
 };
+
+export default GogoanimePluginOld;

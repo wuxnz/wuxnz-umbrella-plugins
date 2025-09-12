@@ -1,24 +1,15 @@
-// Include ts-nocheck here if using modules that arent builtin to node
-// Also delete any imports from this file. Use require() instead
-//This is an example plugin. Do not use in production.
-// Functions' return types are placeholders
-// Actual types are in models/ folder
-// Refer to models/ContentService.ts
+import { type CheerioAPI, load } from 'cheerio';
 
-import { Cheerio, CheerioAPI } from "cheerio";
-
-const cheerio = require("cheerio");
-
-var buffer = require("buffer").Buffer;
 class GogoanimePlugin {
   baseUrl = "https://gogoanimez.to";
   // ajaxUrl = 'https://ajax.gogocdn.net';
   sourceType = "Video";
-  async search(query, page) {
+  async search(query: string, page?: number): Promise<object> {
+    const baseUrl = this.baseUrl;
     try {
       const pageNum = page || 1;
 
-      const url = `${this.baseUrl}/page/${pageNum}/?s=${query}`;
+      const url = `${baseUrl}/page/${pageNum}/?s=${query}`;
       const response = await fetch(url)
         .then((response) => response)
         .then((data) => data.text());
@@ -26,8 +17,7 @@ class GogoanimePlugin {
         return {};
       }
 
-      // @ts-expect-error
-      const $ = Cheerio.load(response);
+      const $: CheerioAPI = load(response);
 
       var items = [];
       $(".bs").each(function () {
@@ -40,7 +30,7 @@ class GogoanimePlugin {
         item["description"] = $(this).find(".typez").text().trim();
         item["imageUrl"] = $(this).find("img").attr("src");
         item["url"] = $(this).find("a").attr("href").startsWith("/")
-          ? `${this.baseUrl}${$(this).find("a").attr("href")}`
+          ? `${baseUrl}${$(this).find("a").attr("href")}`
           : $(this).find("a").attr("href");
         item["type"] = "Video";
         items.push(item);
@@ -58,17 +48,16 @@ class GogoanimePlugin {
       throw err;
     }
   }
-  async getCategory(category, page) {
+  async getCategory(category: string, page?: number): Promise<object> {
     return {};
   }
-  async getHomeCategories() {
+  async getHomeCategories(): Promise<object[]> {
     const baseUrl = this.baseUrl;
     const response = await fetch(`${baseUrl}`)
       .then((response) => response)
       .then((data) => data.text());
 
-    // @ts-expect-error
-    const $: CheerioAPI = Cheerio.load(response);
+    const $: CheerioAPI = load(response);
 
     var categories = [];
 
@@ -197,8 +186,7 @@ class GogoanimePlugin {
       return {};
     }
 
-    // @ts-expect-error
-    const $ = Cheerio.load(response);
+    const $: CheerioAPI = load(response);
 
     const name = $("h1.entry-title").text().trim();
     const description = $(".spe span")
@@ -320,3 +308,5 @@ module.exports = {
     new GogoanimePlugin().getItemDetails(id),
   getItemMedia: async (id: string) => new GogoanimePlugin().getItemMedia(id),
 };
+
+export default GogoanimePlugin;
