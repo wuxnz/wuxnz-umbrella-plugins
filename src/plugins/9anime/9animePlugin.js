@@ -1,5 +1,4 @@
 "use strict";
-// import { Cheerio, CheerioAPI } from "cheerio";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,8 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-// const cheerio = require("cheerio");
+const cheerio_1 = require("cheerio");
+const SourceType_1 = __importDefault(require("../../models/source/SourceType"));
+const MediaType_1 = __importDefault(require("../../models/media/MediaType"));
 class NineAnimePlugin {
     constructor() {
         this.baseUrl = "https://9animetv.to";
@@ -25,8 +29,7 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response); // as CheerioAPI;
+            const $ = (0, cheerio_1.load)(response);
             var items = [];
             var index = 0;
             $(".flw-item").each(function () {
@@ -40,7 +43,7 @@ class NineAnimePlugin {
                 item["url"] = $(this).find("a").attr("href").startsWith("/")
                     ? `${baseUrl}${$(this).find("a").attr("href")}`
                     : $(this).find("a").attr("href");
-                item["type"] = "Video";
+                item["type"] = SourceType_1.default.Video;
                 items.push(item);
                 index++;
             });
@@ -70,8 +73,7 @@ class NineAnimePlugin {
             if (!response) {
                 return [];
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = (0, cheerio_1.load)(response);
             var categories = [];
             categories.push({
                 name: "Featured",
@@ -102,7 +104,7 @@ class NineAnimePlugin {
                                 .find("div.desi-head-title > a")
                                 .attr("href")}`
                             : $(this).find("div.desi-head-title > a").attr("href");
-                        item["type"] = "Video";
+                        item["type"] = SourceType_1.default.Video;
                         items.push(item);
                     });
                     return items;
@@ -181,7 +183,7 @@ class NineAnimePlugin {
                             item["url"] = $(this).find("a").attr("href").startsWith("/")
                                 ? `${baseUrl}${$(this).find("a").attr("href")}`
                                 : $(this).find("a").attr("href");
-                            item["type"] = "Video";
+                            item["type"] = SourceType_1.default.Video;
                             return item;
                         });
                         categories.push(category);
@@ -221,7 +223,7 @@ class NineAnimePlugin {
                             .startsWith("/")
                             ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
                             : $(this).find("h3.film-name > a").attr("href");
-                        item["type"] = "Video";
+                        item["type"] = SourceType_1.default.Video;
                         items.push(item);
                     });
                     return items;
@@ -240,8 +242,7 @@ class NineAnimePlugin {
             if (!response) {
                 return {};
             }
-            // @ts-expect-error
-            const $ = Cheerio.load(response);
+            const $ = (0, cheerio_1.load)(response);
             const name = $("h2.film-name").text().trim();
             const imageUrl = $(".anime-poster > div:nth-child(1) > img:nth-child(1)").attr("src");
             const synopsis = $(".shorting").text().trim();
@@ -255,7 +256,7 @@ class NineAnimePlugin {
                 item["url"] = $(this).find("a").attr("href").startsWith("/")
                     ? `${baseUrl}${$(this).find("a").attr("href")}`
                     : $(this).find("a").attr("href");
-                item["type"] = "Video";
+                item["type"] = SourceType_1.default.Video;
                 related.push(item);
             });
             const metaInfos = $(".col1 > div");
@@ -326,6 +327,7 @@ class NineAnimePlugin {
                         url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
                         language: "Unknown",
                         number: Number(item[3].trim()),
+                        type: MediaType_1.default.ExtractorVideo,
                     });
                 });
             }
@@ -335,7 +337,7 @@ class NineAnimePlugin {
                 description: description,
                 imageUrl: imageUrl,
                 url: url,
-                type: "Video",
+                type: SourceType_1.default.Video,
                 language: "Unknown",
                 synopsis: synopsis,
                 related: related,
@@ -374,7 +376,7 @@ class NineAnimePlugin {
                 if (serverResponse.link != null &&
                     serverResponse.link != undefined &&
                     serverResponse.link != "") {
-                    source["type"] = "ExtractorVideo";
+                    source["type"] = MediaType_1.default.ExtractorVideo;
                     source["url"] = serverResponse.link;
                     source["name"] = server.name + " - " + server.language;
                     sources.push(source);

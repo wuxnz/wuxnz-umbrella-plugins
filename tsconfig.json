@@ -5,10 +5,10 @@
     "target": "es6",
     "moduleResolution": "node",
     "sourceMap": false,
-    "rootDir": "plugins",
-    "outDir": "plugins",
+    "rootDir": "src",
+    "outDir": "src",
     "types": ["node"]
   },
   "lib": ["es2015"],
-  "exclude": ["node_modules", "dist", "models", "pluginTests.ts"]
+  "exclude": ["node_modules", "pluginTests.ts"]
 }

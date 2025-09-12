@@ -1,25 +1,34 @@
-// import { Cheerio, CheerioAPI } from "cheerio";
+import { type CheerioAPI, load } from 'cheerio';
+import SourceType from '../../models/source/SourceType';
+import MediaType from '../../models/media/MediaType';
+import Category from '../../models/item/Category';
+import DetailedItem from '../../models/item/DetailedItem';
+import ExtractorAudio from '../../models/media/ExtractorAudio';
+import ExtractorVideo from '../../models/media/ExtractorVideo';
+import RawAudio from '../../models/media/RawAudio';
+import RawVideo from '../../models/media/RawVideo';
+import ItemMedia from '../../models/item/ItemMedia';
+import Item from '../../models/item/Item';
+import ContentService from '../../models/ContentService';
+import Genre from '../../models/item/Genre';
 
-// const cheerio = require("cheerio");
-
-class NineAnimePlugin {
+class NineAnimePlugin implements ContentService {
   baseUrl = "https://9animetv.to";
 
-  async search(query: string, page?: number) {
+  async search(query: string, page?: number): Promise<Category> {
     var baseUrl = this.baseUrl;
     const url = `${baseUrl}/search?keyword=${query}&page=${page || 1}`;
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
-      return {};
+      return {} as Category;
     }
-    // @ts-expect-error
-    const $ = Cheerio.load(response); // as CheerioAPI;
-    var items = [];
+    const $ = load(response);
+    var items: Item[] = [];
     var index = 0;
     $(".flw-item").each(function () {
-      var item = {};
+      var item: Partial<Item> = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
       item["name"] = $(this).find(".dynamic-name").text().trim();
       item["description"] = $(
@@ -31,8 +40,8 @@ class NineAnimePlugin {
       item["url"] = $(this).find("a").attr("href").startsWith("/")
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
-      item["type"] = "Video";
-      items.push(item);
+      item["type"] = SourceType.Video;
+      items.push(item as Item);
       index++;
     });
     return {
@@ -43,26 +52,25 @@ class NineAnimePlugin {
       nextPageNumber: page + 1,
       previousPageNumber: page > 1 ? page - 1 : undefined,
       items: items,
-    };
+    } as Category;
   }
 
-  async getCategory(category: string, page?: number): Promise<object> {
-    return {};
+  async getCategory(category: string, page?: number): Promise<Category> {
+    return {} as Category;
   }
 
-  async getHomeCategories(): Promise<object[]> {
+  async getHomeCategories(): Promise<Category[]> {
     const baseUrl = this.baseUrl;
     const url = `${baseUrl}/home`;
     const response = await fetch(url)
       .then((response) => response)
       .then((data) => data.text());
     if (!response) {
-      return [];
+      return [] as Category[];
     }
-    // @ts-expect-error
-    const $ = Cheerio.load(response);
+    const $ = load(response);
 
-    var categories = [];
+    var categories: Category[] = [];
 
     categories.push({
       name: "Featured",
@@ -70,9 +78,9 @@ class NineAnimePlugin {
       url: url,
       isPaginated: false,
       items: (($: any) => {
-        var items = [];
+        var items: Item[] = [];
         $("#slider > div:nth-child(1) > div.swiper-slide").each(function () {
-          var item = {};
+          var item: Partial<Item> = {};
           item["id"] = $(this)
             .find("div.desi-head-title > a")
             .attr("href")
@@ -93,8 +101,8 @@ class NineAnimePlugin {
                 .find("div.desi-head-title > a")
                 .attr("href")}`
             : $(this).find("div.desi-head-title > a").attr("href");
-          item["type"] = "Video";
-          items.push(item);
+          item["type"] = SourceType.Video;
+          items.push(item as Item);
         });
         return items;
       })($),
@@ -139,19 +147,19 @@ class NineAnimePlugin {
           item["type"] = "Video";
           items.push(item);
         });
-        return items;
+        return items as Item[];
       })($),
-    });
+    } as Category);
 
     function parseMultiCategory($: any) {
-      var categories = [];
+      var categories: Category[] = [];
       // var categoryItems = [];
       $("div.tab-content > div").each(function () {
         if (
           !($(this).find("ul > li").length == 0) &&
           !($(this).attr("id") == undefined)
         ) {
-          var category = {};
+          var category: Partial<Category> = {};
           category["name"] = $(this)
             .attr("id")
             .split("-")
@@ -162,7 +170,7 @@ class NineAnimePlugin {
           category["items"] = $(this)
             .find("ul > li")
             .map(function () {
-              var item = {};
+              var item: Partial<Item> = {};
               item["id"] = $(this).find("a").attr("href").split("/")[2];
               item["name"] = $(this).find("a").text().trim();
               item["description"] = $(this)
@@ -178,13 +186,13 @@ class NineAnimePlugin {
               item["url"] = $(this).find("a").attr("href").startsWith("/")
                 ? `${baseUrl}${$(this).find("a").attr("href")}`
                 : $(this).find("a").attr("href");
-              item["type"] = "Video";
+              item["type"] = SourceType.Video;
               return item;
             });
-          categories.push(category);
+          categories.push(category as Category);
         }
       });
-      return categories;
+      return categories as Category[];
     }
 
     categories.push(...parseMultiCategory($));
@@ -203,11 +211,11 @@ class NineAnimePlugin {
       url: url,
       isPaginated: false,
       items: (($: any) => {
-        var items = [];
+        var items: Item[] = [];
         $(
           "section.block_area_sidebar:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li"
         ).each(function () {
-          var item = {};
+          var item: Partial<Item> = {};
           item["id"] = $(this)
             .find("h3.film-name > a")
             .attr("href")
@@ -226,17 +234,17 @@ class NineAnimePlugin {
             .startsWith("/")
             ? `${baseUrl}${$(this).find("h3.film-name > a").attr("href")}`
             : $(this).find("h3.film-name > a").attr("href");
-          item["type"] = "Video";
-          items.push(item);
+          item["type"] = SourceType.Video;
+          items.push(item as Item);
         });
-        return items;
+        return items as Item[];
       })($),
-    });
+    } as Category);
 
     return categories;
   }
 
-  async getItemDetails(id: string): Promise<object> {
+  async getItemDetails(id: string): Promise<DetailedItem> {
     const baseUrl = this.baseUrl;
     const url = `${baseUrl}/watch/${id}`;
     const response = await fetch(url)
@@ -244,20 +252,19 @@ class NineAnimePlugin {
       .then((data) => data.text());
 
     if (!response) {
-      return {};
+      return {} as DetailedItem;
     }
-    // @ts-expect-error
-    const $ = Cheerio.load(response);
+    const $ = load(response);
     const name = $("h2.film-name").text().trim();
     const imageUrl = $(
       ".anime-poster > div:nth-child(1) > img:nth-child(1)"
     ).attr("src");
     const synopsis = $(".shorting").text().trim();
-    var related = [];
+    var related: Item[] = [];
     $(
       ".cbox-collapse > div:nth-child(1) > div:nth-child(1) > ul:nth-child(1) > li"
     ).each(function () {
-      var item = {};
+      var item: Partial<Item> = {};
       item["id"] = $(this).find("a").attr("href").split("/")[2];
       item["name"] = $(this).find("a").text().trim();
       item["description"] = $(this).find("span").text().trim();
@@ -265,8 +272,8 @@ class NineAnimePlugin {
       item["url"] = $(this).find("a").attr("href").startsWith("/")
         ? `${baseUrl}${$(this).find("a").attr("href")}`
         : $(this).find("a").attr("href");
-      item["type"] = "Video";
-      related.push(item);
+      item["type"] = SourceType.Video;
+      related.push(item as Item);
     });
     const metaInfos = $(".col1 > div");
     const description = metaInfos
@@ -278,7 +285,7 @@ class NineAnimePlugin {
       .find(".item-content")
       .text()
       .trim();
-    var genres = [];
+    var genres: Genre[] = [];
     var genresElement = metaInfos.filter(function () {
       return (
         $(this).find(".item-title").text().trim().toLowerCase() == "genre:"
@@ -286,7 +293,7 @@ class NineAnimePlugin {
     });
     if (genresElement.length > 0) {
       genresElement.find(".item-content > a").each(function () {
-        var genre = {};
+        var genre: Partial<Genre> = {};
         genre["id"] = $(this).attr("href").split("/")[2];
         genre["name"] = $(this).text().trim();
         genre["url"] = $(this).attr("href").startsWith("/")
@@ -295,7 +302,7 @@ class NineAnimePlugin {
         genre["isPaginated"] = true;
         genre["nextPageNumber"] = 1;
         genre["previousPageNumber"] = undefined;
-        genres.push(genre);
+        genres.push(genre as Genre);
       });
     }
     var releaseDate;
@@ -336,7 +343,7 @@ class NineAnimePlugin {
     }
     var otherNames = $(".alias").text().trim().split(", ");
 
-    var episodes = [];
+    var episodes: ItemMedia[] = [];
     const episodeResponse = await fetch(
       `${baseUrl}/ajax/episode/list/${id.split("-")[id.split("-").length - 1]}`
     )
@@ -352,7 +359,8 @@ class NineAnimePlugin {
           url: item[1].startsWith("/") ? `${baseUrl}${item[1]}` : item[1],
           language: "Unknown",
           number: Number(item[3].trim()),
-        });
+          type: MediaType.ExtractorVideo,
+        } as ItemMedia);
       });
     }
 
@@ -362,7 +370,7 @@ class NineAnimePlugin {
       description: description,
       imageUrl: imageUrl,
       url: url,
-      type: "Video",
+      type: SourceType.Video,
       language: "Unknown",
       synopsis: synopsis,
       related: related,
@@ -373,10 +381,10 @@ class NineAnimePlugin {
       creators: creators,
       status: status,
       otherNames: otherNames,
-    };
+    } as DetailedItem;
   }
 
-  async getItemMedia(id: string): Promise<object[]> {
+  async getItemMedia(id: string): Promise<(ExtractorAudio | ExtractorVideo | RawAudio | RawVideo)[]> {
     const baseUrl = this.baseUrl;
     const serversUrl = `${baseUrl}/ajax/episode/servers?episodeId=${
       id.split("ep=")[1]
@@ -395,7 +403,7 @@ class NineAnimePlugin {
         };
       }
     );
-    var sources = [];
+    var sources: (ExtractorVideo | ExtractorAudio | RawAudio | RawVideo)[] = [];
     for (const server of servers) {
       var source = {};
       const serverUrl = `${baseUrl}/ajax/episode/sources?id=${server.id}`;
@@ -407,10 +415,10 @@ class NineAnimePlugin {
         serverResponse.link != undefined &&
         serverResponse.link != ""
       ) {
-        source["type"] = "ExtractorVideo";
+        source["type"] = MediaType.ExtractorVideo;
         source["url"] = serverResponse.link;
         source["name"] = server.name + " - " + server.language;
-        sources.push(source);
+        sources.push(source as ExtractorVideo);
       }
     }
     return sources;
