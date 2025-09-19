@@ -16,6 +16,9 @@
 // Functions' return types are placeholders
 // Actual types are in models/ folder
 // Refer to models/ContentService.ts
+
+import { type CheerioAPI, load } from "cheerio";
+
 class ExamplePlugin {
   async search(query: string, page?: number) {
     return {};

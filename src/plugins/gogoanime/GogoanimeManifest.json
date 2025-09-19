@@ -1,0 +1,15 @@
+{
+  "sourceType": "Video",
+  "author": "invader",
+  "name": "Goganime",
+  "version": 5,
+  "description": "Gogoanime for Umbrella by invader",
+  "homePageUrl": "https://wuxnz.github.io/wuxnz-umbrella-plugins/",
+  "iconUrl": "https://gogoanimez.to/wp-content/uploads/2025/08/cropped-xcropped-icon-1-32x32.webp.pagespeed.ic_.ZrytaVsz_G-32x32.webp",
+  "manifestUrl": "https://wuxnz.github.io/wuxnz-umbrella-plugins/src/plugins/gogoanime/GogoanimeManifest.json",
+  "pluginUrl": "https://wuxnz.github.io/wuxnz-umbrella-plugins/src/plugins/gogoanime/Gogoanime.js",
+  "bannerImageUrl": "https://gogoanimez.to/wp-content/uploads/2025/08/logo-2.png",
+  "changelog": "They changed their website layout, so I had to update the plugin. Everything should work now.",
+  "readme": "This is a plugin that allows you to scrape Gogoanime for Umbrella.",
+  "license": "MIT"
+}
