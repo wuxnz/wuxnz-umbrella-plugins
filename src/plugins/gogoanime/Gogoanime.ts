@@ -38,7 +38,7 @@ class Gogoanime {
         items.push(item);
       });
       return {
-        name: "Gogoanime (Old)",
+        name: "Gogoanime",
         description: `Search results for ${query}`,
         url: decodeURIComponent(
           `${this.baseUrl}/search.html?keyword=${query}&page=${page}`

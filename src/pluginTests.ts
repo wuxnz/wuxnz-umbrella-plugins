@@ -1,6 +1,6 @@
 import Gogoanime from "./plugins/gogoanime/Gogoanime";
 
-import GogoanimeOld from "./plugins/gogoanime-old/GoganimeOld";
+import GogoanimeOld from "./plugins/gogoanime-old/GogoanimeOld";
 
 import NineAnime from "./plugins/9anime/9anime";
 
